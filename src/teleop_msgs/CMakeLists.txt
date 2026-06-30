@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(test_msgs)
+project(teleop_msgs)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -15,6 +15,7 @@ find_package(rosidl_default_generators REQUIRED)
 
 # declare the message files to generate code for
 # taken from the autonomous racing team
+# todo the build folders have to be deleted if new messages are added, may revert to just enumerating all messages
 file(GLOB msg_files
   LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   "msg/*.msg"
