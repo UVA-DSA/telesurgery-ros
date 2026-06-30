@@ -1,0 +1,2 @@
+bool short_term_recovery
+bool long_term_recovery
