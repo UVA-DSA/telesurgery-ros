@@ -1,6 +1,6 @@
 # todo this is a copy of raven_state.msg and is probably not correct for our purposes
 
-Header      hdr
+# Header      hdr
 int32       runlevel
 int32       sublevel
 int32       last_seq
