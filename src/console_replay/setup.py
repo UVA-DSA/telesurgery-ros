@@ -1,3 +1,6 @@
+import os.path
+from glob import glob
+
 from setuptools import find_packages, setup
 
 package_name = 'console_replay'
@@ -10,6 +13,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'replay_files'), glob('replay_files/*'))
     ],
     package_data={'': ['py.typed']},
     install_requires=['setuptools'],
@@ -25,7 +29,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'console_replay = console_replay.console_replay:main'
+            'console_replay = console_replay.console_replay_node:main'
         ],
     },
 )
