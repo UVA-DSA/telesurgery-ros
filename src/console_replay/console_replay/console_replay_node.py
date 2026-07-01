@@ -3,8 +3,9 @@ import os
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
+from ament_index_python.packages import get_package_share_directory
 
-from src.console_replay.console_replay.replay import replayoverport
+from .replay import replayoverport
 
 
 ## This node wraps replay.py from the telesurgery-qos-analysis repository.
@@ -23,6 +24,7 @@ class ConsoleReplay(Node):
         )
 
         self.replay_obj = replayoverport(filepath=data_file_path)
+        print("Starting replay")
         self.replay_obj.replay_log(dest_ip='127.0.0.1')
 
 def main(args=None) -> None:
