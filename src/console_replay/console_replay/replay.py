@@ -61,7 +61,8 @@ class replayoverport:
         if total_time > 0:
             print(f"Average frequency: {packet_count / total_time:.2f} Hz")
 
-scene = replayoverport(filepath=f"dVTrainer/Data/replay_data/console_data_complete_7.bin")
-#scene.start()
-scene.replay_log(dest_ip='127.0.0.1')
-#scene.stop()
+if __name__ == '__main__':
+    scene = replayoverport(filepath=f"dVTrainer/Data/replay_data/console_data_complete_7.bin")
+    #scene.start()
+    scene.replay_log(dest_ip='127.0.0.1')
+    #scene.stop()
