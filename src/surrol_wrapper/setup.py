@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'surrol'
+package_name = 'surrol_wrapper'
 
 setup(
     name=package_name,
@@ -25,7 +25,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'surrol = surrol.surrol:main'
+            'surrol_wrapper = surrol_wrapper.surrol_wrapper:main'
         ],
     },
 )
