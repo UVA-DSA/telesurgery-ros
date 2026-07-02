@@ -51,7 +51,7 @@ class replayoverport:
                     break
 
                 system_time = time.time()
-                sock.sendto(data, (dest_ip, self.EMULATOR_PORT))  # ← was RECEIVER_PORT
+                sock.sendto(data, (dest_ip, self.RECEIVER_PORT))  # ← was RECEIVER_PORT
                 packet_count += 1
                 previous_time = current_packet_time
 

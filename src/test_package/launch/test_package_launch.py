@@ -4,17 +4,17 @@ from launch_ros.actions import Node
 def generate_launch_description():
     return LaunchDescription([
         Node(
-            package='test_package',
-            executable='talker',
-            name='minimal_publisher',
+            package='console_replay',
+            executable='console_replay',
+            name='console_replay_node',
             # todo this is for something important, don't know what yet
             arguments=[]
         ),
 
         Node(
-            package='test_package',
-            executable='listener',
-            name='minimal_subscriber',
+            package='input',
+            executable='input',
+            name='input_node',
             arguments=[]
         )
     ])

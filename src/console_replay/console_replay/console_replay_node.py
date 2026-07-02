@@ -24,7 +24,7 @@ class ConsoleReplay(Node):
         )
 
         self.replay_obj = replayoverport(filepath=data_file_path)
-        print("Starting replay")
+        self.get_logger().info("Starting replay")
         self.replay_obj.replay_log(dest_ip='127.0.0.1')
 
 def main(args=None) -> None:
