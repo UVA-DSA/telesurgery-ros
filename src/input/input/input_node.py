@@ -31,7 +31,7 @@ class Input(Node):
         self.format_str = '<IIIiiiiiiddddddddiiiiii'
 
         self.init_sock_udp()
-        self.publish_thread = threading.Thread(target=self.itp_publisher, daemon=True)
+        self.publish_thread = threading.Thread(target=self.publish_itp, daemon=True)
         self.publish_thread.start()
         self.udp_listener()
 
@@ -73,7 +73,7 @@ class Input(Node):
 
 
     def to_msg(self, d) -> ITP:
-        msg = ITP()
+        msg: ITP = ITP()
         msg.sequence = d['sequence']
         msg.pactyp = d['pactyp']
         msg.version = d['version']
