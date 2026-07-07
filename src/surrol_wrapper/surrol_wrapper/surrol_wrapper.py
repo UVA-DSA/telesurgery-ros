@@ -4,6 +4,9 @@ import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
+########################
+# Unused at the moment #
+########################
 
 class Surrol(Node):
     def __init__(self):
