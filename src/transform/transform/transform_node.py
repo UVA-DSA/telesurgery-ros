@@ -3,7 +3,7 @@ import rclpy
 from rclpy import Node
 from rclpy.executors import ExternalShutdownException
 
-from teleop_msgs import ITP
+from teleop_msgs.msg import ITP
 
 class Transform(Node):
     def __init__(self):
@@ -23,7 +23,14 @@ class Transform(Node):
 
 
     def ITP_callback(self, msg: ITP):
-        pass
+        delta_position0 = (msg.delx0, msg.dely0, msg.delz0)
+        delta_position1 = (msg.delx1, msg.dely1, msg.delz1)
+        delta_orientation0 = (msg.qx0, msg.qy0, msg.qz0)
+        delta_orientation1 = (msg.qx1, msg.qy1, msg.qz1)
+        delta_grasp0 = msg.grasp0
+        delta_grasp1 = msg.grasp1
+        sequence = msg.sequence
+        surgeon_mode = msg.surgeon_mode
 
     def transform_console_data(self):
         delta_pos_0 = self.position_transform(self.delta_pos_0_sum)
@@ -36,25 +43,6 @@ class Transform(Node):
         gripper_1 = self.map_grasper(self._right_val)
 
         return [delta_pos_0, delta_rot_0, delta_pos_1, delta_rot_1, gripper_0, gripper_1]
-
-    def get_psm_vars(self, command, index):
-        deltaX = command[f'delx{index}']
-        deltaY = command[f'dely{index}']
-        deltaZ = command[f'delz{index}']
-
-        deltaQx = command[f'Qx{index}']
-        deltaQy = command[f'Qy{index}']
-        deltaQz = command[f'Qz{index}']
-
-        delta_grasp = command[f'grasp{index}']
-
-        return ((deltaX, deltaY, deltaZ), (deltaQx, deltaQy, deltaQz), delta_grasp)
-
-    def get_packet_data(self, command):
-        sequence = command[f'sequence']
-        surgeon_mode = command[f'surgeon_mode']
-
-        return sequence, surgeon_mode
 
     def update_delta_variables_dual(self, sequence, delta_position0, delta_position1, delta_orientation0,
                                     delta_orientation1, delta_grasp0, delta_grasp1, surgeon_mode):
