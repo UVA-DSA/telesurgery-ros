@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'control'
+package_name = 'transform'
 
 setup(
     name=package_name,
@@ -25,7 +25,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'control = control.control_node:main'
+            'transform_node = transform.transform_node:main'
         ],
     },
 )

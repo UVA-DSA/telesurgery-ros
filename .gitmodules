@@ -1,0 +1,3 @@
+[submodule "src/surrol_wrapper/surrol_wrapper/telesurgery-qos-analysis"]
+	path = src/surrol_wrapper/telesurgery_qos_analysis
+	url = https://github.com/UVA-DSA/telesurgery-qos-analysis

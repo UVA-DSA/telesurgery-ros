@@ -25,7 +25,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'input = input.input:main'
+            'input = input.input_node:main'
         ],
     },
 )

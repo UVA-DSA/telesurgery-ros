@@ -1,17 +1,22 @@
+import os
+from glob import glob
+
 from setuptools import find_packages, setup
 
-package_name = 'control'
+package_name = 'surrol_wrapper'
 
 setup(
     name=package_name,
     version='0.0.0',
     packages=find_packages(exclude=['test']),
+    include_package_data=True,
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    package_data={'': ['py.typed']},
+    package_data={'': ['py.typed'],
+                  'dVTrainer': ['*.txt']},
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='Aidan Liu',
@@ -25,7 +30,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'control = control.control_node:main'
+            'surrol_wrapper = surrol_wrapper.surrol_wrapper:main'
         ],
     },
 )
