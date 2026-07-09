@@ -69,7 +69,6 @@ class Input(Node):
             if self.udp_queue.empty(): continue
             msg = self.to_msg(self.udp_queue.get())
             self.itp_publisher.publish(msg)
-            self.get_logger().info("published ITP message")
 
 
     def to_msg(self, d) -> ITP:
