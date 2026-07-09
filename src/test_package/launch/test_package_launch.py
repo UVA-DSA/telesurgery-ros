@@ -16,5 +16,12 @@ def generate_launch_description():
             executable='input',
             name='input_node',
             arguments=[]
-        )
+        ),
+
+        Node(
+            package='surrol_wrapper',
+            executable='surrol_wrapper',
+            name='surrol_wrapper',
+            arguments=[]
+        ),
     ])
