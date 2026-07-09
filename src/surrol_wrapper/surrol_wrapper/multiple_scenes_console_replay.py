@@ -39,9 +39,9 @@ from direct.task import Task
 from surrol.utils.pybullet_utils import step
 
 from dVTrainer import Net, Console
-from dVTrainer import DataLogger
-from dVTrainer import user_num
-from dVTrainer import OBSController
+from dVTrainer.data_collector import DataLogger
+from dVTrainer.random_experiment_new import user_num
+from dVTrainer.obs_controller import OBSController
 from scipy.spatial.transform import Rotation as R
 
 app = None
