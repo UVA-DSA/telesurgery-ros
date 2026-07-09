@@ -1,4 +1,5 @@
 import os
+os.environ["KIVY_NO_ARGS"] = "1"
 from kivy.lang import Builder
 import numpy as np
 import torch
