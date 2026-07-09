@@ -2454,6 +2454,7 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
 
 
 def main(): # ecm steoro size 1024x768
+    global app
     app_cfg = ApplicationConfig(window_width=1850, window_height=1020)
     app = Application(app_cfg)
     open_scene(0)
