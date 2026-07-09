@@ -9,7 +9,7 @@ class Surrol(Node):
     def __init__(self):
         super().__init__('surrol_node')
 
-        multiple_scenes_console_replay.main()
+        multiple_scenes_console_replay.main(node=self)
 
 def main(args=None) -> None:
     try:
