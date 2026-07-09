@@ -2121,9 +2121,10 @@ class SurgicalSimulator(SurgicalSimulatorBase):
 
 class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
     def __init__(self, env_type, env_params, jaw_states=[1.0, 1.0],id=None,demo=None):
+        global ros_node
         super(SurgicalSimulatorBimanual, self).__init__(env_type, env_params)
         self.network = Net()
-        self.console = Console(self.network)
+        self.console = Console(self.network, ros_node)
 
         self.id=id
         self.demo = demo
@@ -2452,9 +2453,9 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
         self.kivy_ui.stop()
         self.app.win.removeDisplayRegion(self.ui_display_region)
 
-
-def main(): # ecm steoro size 1024x768
-    global app
+def main(node=None): # ecm steoro size 1024x768
+    global app, ros_node
+    ros_node = node
     app_cfg = ApplicationConfig(window_width=1850, window_height=1020)
     app = Application(app_cfg)
     open_scene(0)

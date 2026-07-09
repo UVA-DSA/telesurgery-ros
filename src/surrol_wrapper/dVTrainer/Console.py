@@ -5,14 +5,22 @@ import struct
 import threading
 import numpy as np
 from collections import namedtuple
+
+from pandas.core.methods.to_dict import to_dict
+
 from .data_collector import DataLogger
 from .random_experiment_new import user_num
 
+from rclpy.node import Node
+from teleop_msgs.msg import ITP
+
 class Console:
-    def __init__(self, network):
+    def __init__(self, network, ros_node=None):
         self.running = True
         self.ip = '127.0.0.1'
         self.port = 5001
+        self.ros_node: Node = ros_node
+        self.subscription = None
 
         self.udp_queue = queue.Queue()
         self.transform_queue = queue.Queue()
@@ -51,6 +59,45 @@ class Console:
         print(f"Initialized a UDP server on IP: {self.ip} and port: {self.port}")
         print("Listening for incoming data: \n")
 
+    def init_itp_listener(self):
+        self.subscription = self.ros_node.create_subscription(
+            ITP,
+            '/itp_commands',
+            self.itp_callback,
+            10
+        )
+
+    def itp_callback(self, msg: ITP):
+        command: dict = self.to_dict(msg)
+        self.udp_queue.put(command)
+
+    def to_dict(self, msg: ITP):
+        d = dict()
+        d['sequence'] = msg.sequence
+        d['pactyp'] = msg.pactyp
+        d['version'] = msg.version
+        d['delx0'] = msg.delx0
+        d['delx1'] = msg.delx1
+        d['dely0'] = msg.dely0
+        d['dely1'] = msg.dely1
+        d['delz0'] = msg.delz0
+        d['delz1'] = msg.delz1
+        d['Qx0'] = msg.qx0
+        d['Qx1'] = msg.qx1
+        d['Qy0'] = msg.qy0
+        d['Qy1'] = msg.qy1
+        d['Qz0'] = msg.qz0
+        d['Qz1'] = msg.qz1
+        d['Qw0'] = msg.qw0
+        d['Qw1'] = msg.qw1
+        d['buttonstate0'] = msg.buttonstate0
+        d['buttonstate1'] = msg.buttonstate1
+        d['grasp0'] = msg.grasp0
+        d['grasp1'] = msg.grasp1
+        d['surgeon_mode'] = msg.surgeon_mode
+        d['checksum'] = msg.checksum
+        return d
+
     def start_receive_thread(self):
         """Start listening for UDP packets in a separate thread."""
         self.receieve_thread = threading.Thread(target=self.receive_udp_packets, daemon=True)
@@ -81,7 +128,7 @@ class Console:
         """Start listening for UDP packets in a separate thread."""
         self.transformation_thread = threading.Thread(target=self.data_transformation, daemon=True)
         self.transformation_thread.start()
-        print("Started listening for incoming UDP packets...") 
+        print("Started data transformation thread...")
     
     def data_transformation(self):
         while self.running:
@@ -186,17 +233,18 @@ class Console:
     
     def start(self):
         """Start the console to receive and transform data."""
-        self.init_sock_udp()
-        self.start_receive_thread()
+        # self.init_sock_udp()
+        self.init_itp_listener()
+        # self.start_receive_thread()
         self.start_transformation_thread()
 
     def close(self):
         """Close the UDP socket."""
         self.running = False
-        self.sock.close()
+        # self.sock.close()
         self.udp_queue.put(None)
         self.transform_queue.put(None)
-        self.receieve_thread.join()
+        # self.receieve_thread.join()
         self.transformation_thread.join()
         
     def set_event(self):
