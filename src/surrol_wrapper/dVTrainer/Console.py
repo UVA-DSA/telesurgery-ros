@@ -64,12 +64,11 @@ class Console:
             ITP,
             '/itp_commands',
             self.itp_callback,
-            10
+            100
         )
 
     def itp_callback(self, msg: ITP):
-        command: dict = self.to_dict(msg)
-        self.udp_queue.put(command)
+        self.udp_queue.put(msg)
 
     def to_dict(self, msg: ITP):
         d = dict()
@@ -134,7 +133,10 @@ class Console:
         while self.running:
             command = self.udp_queue.get()
             if command is None:
-                break  
+                break
+            if not isinstance(command, dict):
+                command: dict = self.to_dict(command)
+                
             delta_position0, delta_orientation0, delta_grasp0= self.get_psm_vars(command, 0)
             delta_position1, delta_orientation1, delta_grasp1 = self.get_psm_vars(command, 1)
             sequence, pedal = self.get_packet_data(command)
