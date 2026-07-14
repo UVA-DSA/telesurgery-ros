@@ -13,6 +13,7 @@ from .random_experiment_new import user_num
 
 from rclpy.node import Node
 from teleop_msgs.msg import ITP
+from std_msgs.msg import Bool
 
 class Console:
     def __init__(self, network, ros_node=None):
@@ -44,6 +45,11 @@ class Console:
         c = network.C_enabled
         m = network.model_str
         n = network.trial_num
+
+        self.start_publisher = self.ros_node.create_publisher(Bool, '/replay_start', 10)
+        msg = Bool()
+        msg.data = True
+        self.start_publisher.publish(msg)
 
         self.logger = DataLogger("console_data_recieved", p, d, c, m, n, str(user_num), buffer_size=200)
 
