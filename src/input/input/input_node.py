@@ -20,7 +20,7 @@ class Input(Node):
     def __init__(self):
         super().__init__('input')
 
-        self.itp_publisher = self.create_publisher(ITP, '/itp_commands', 10)
+        self.itp_publisher = self.create_publisher(ITP, '/itp_commands', 100)
         self.sock = None
         self.ip = '127.0.0.1'
         self.port = 5001
@@ -33,7 +33,9 @@ class Input(Node):
         self.init_sock_udp()
         self.publish_thread = threading.Thread(target=self.publish_itp, daemon=True)
         self.publish_thread.start()
-        self.udp_listener()
+
+        self.listen_thread = threading.Thread(target=self.udp_listener, daemon=True)
+        self.listen_thread.start()
 
     def init_sock_udp(self):
         # Create a UDP socket and the data struct ----------------------------------------------------
@@ -66,8 +68,8 @@ class Input(Node):
 
     def publish_itp(self):
         while True:
-            if self.udp_queue.empty(): continue
-            msg = self.to_msg(self.udp_queue.get())
+            command = self.udp_queue.get()
+            msg = self.to_msg(command)
             self.itp_publisher.publish(msg)
 
 

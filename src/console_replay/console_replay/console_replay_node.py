@@ -4,6 +4,7 @@ import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
+from std_msgs.msg import Bool
 
 from .replay import replayoverport
 
@@ -24,6 +25,16 @@ class ConsoleReplay(Node):
         )
 
         self.replay_obj = replayoverport(filepath=data_file_path)
+
+        self.subscription = self.create_subscription(
+            Bool,
+            'replay_start',
+            self.start,
+            10
+        )
+
+    def start(self, msg: Bool):
+        if not msg.data: return
         self.get_logger().info("Starting replay")
         self.replay_obj.replay_log(dest_ip='127.0.0.1')
 
