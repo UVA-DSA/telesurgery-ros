@@ -233,18 +233,18 @@ class Console:
     
     def start(self):
         """Start the console to receive and transform data."""
-        # self.init_sock_udp()
-        self.init_itp_listener()
-        # self.start_receive_thread()
+        self.init_sock_udp()
+        # self.init_itp_listener()
+        self.start_receive_thread()
         self.start_transformation_thread()
 
     def close(self):
         """Close the UDP socket."""
         self.running = False
-        # self.sock.close()
+        self.sock.close()
         self.udp_queue.put(None)
         self.transform_queue.put(None)
-        # self.receieve_thread.join()
+        self.receieve_thread.join()
         self.transformation_thread.join()
         
     def set_event(self):
