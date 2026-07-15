@@ -9,6 +9,7 @@ import threading
 from collections import namedtuple
 
 import rclpy.publisher
+from teleop_msgs.msg import ITPRaw
 
 
 class replayoverport:
@@ -64,7 +65,7 @@ class replayoverport:
         if total_time > 0:
             print(f"Average frequency: {packet_count / total_time:.2f} Hz")
 
-    def replay(self, publisher):
+    def replay(self, publisher: rclpy.node.Publisher):
         packet_count = 0
         with lz4.frame.open(self.filepath, 'rb') as f:
             previous_time = 0
@@ -93,6 +94,8 @@ class replayoverport:
                     break
 
                 system_time = time.time()
-                # node.get_logger().info(str(data))
+                msg = ITPRaw()
+                msg.data = data
+                publisher.publish(msg)
                 packet_count += 1
                 previous_time = current_packet_time

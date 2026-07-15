@@ -13,6 +13,6 @@ def generate_launch_description():
             package='console_replay',
             executable='console_replay',
             name='console_replay',
-            parameters=[get_share_file("console_replay", "param/default.yaml")]
+            parameters=[get_share_file("console_replay", "param/udp.yaml")]
         ),
     ])

@@ -7,6 +7,7 @@ from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import Bool
 from rcl_interfaces.msg import ParameterDescriptor
 
+from teleop_msgs.msg import ITPRaw
 from .replay import replayoverport
 
 
@@ -37,6 +38,8 @@ class ConsoleReplay(Node):
             self.start,
             10
         )
+
+        self.itp_raw_publisher = self.create_publisher(ITPRaw, 'itp_commands_raw', 100)
 
     def init_parameters(self):
         data_file_path_descriptor = ParameterDescriptor(
@@ -79,7 +82,9 @@ class ConsoleReplay(Node):
                                        dest_port=self.get_parameter('udp_port').get_parameter_value().integer_value)
         elif mode.lower() == 'ros' or mode.lower() == 'ros2':
             self.get_logger().info("Starting replay on ROS")
-            self.replay_obj.replay(None)
+            self.replay_obj.replay(self.itp_raw_publisher)
+        else:
+            raise KeyError(f"Unsupported mode: {mode}")
 
 def main(args=None) -> None:
     try:

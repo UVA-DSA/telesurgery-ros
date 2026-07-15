@@ -73,32 +73,32 @@ class Input(Node):
             self.itp_publisher.publish(msg)
 
 
-    def to_msg(self, d) -> ITP:
-        msg: ITP = ITP()
-        msg.sequence = d['sequence']
-        msg.pactyp = d['pactyp']
-        msg.version = d['version']
-        msg.delx0 = d['delx0']
-        msg.delx1 = d['delx1']
-        msg.dely0 = d['dely0']
-        msg.dely1 = d['dely1']
-        msg.delz0 = d['delz0']
-        msg.delz1 = d['delz1']
-        msg.qx0 = d['Qx0']
-        msg.qx1 = d['Qx1']
-        msg.qy0 = d['Qy0']
-        msg.qy1 = d['Qy1']
-        msg.qz0 = d['Qz0']
-        msg.qz1 = d['Qz1']
-        msg.qw0 = d['Qw0']
-        msg.qw1 = d['Qw1']
-        msg.buttonstate0 = d['buttonstate0']
-        msg.buttonstate1 = d['buttonstate1']
-        msg.grasp0 = d['grasp0']
-        msg.grasp1 = d['grasp1']
-        msg.surgeon_mode = d['surgeon_mode']
-        msg.checksum = d['checksum']
-        return msg
+def to_msg(d) -> ITP:
+    msg: ITP = ITP()
+    msg.sequence = d['sequence']
+    msg.pactyp = d['pactyp']
+    msg.version = d['version']
+    msg.delx0 = d['delx0']
+    msg.delx1 = d['delx1']
+    msg.dely0 = d['dely0']
+    msg.dely1 = d['dely1']
+    msg.delz0 = d['delz0']
+    msg.delz1 = d['delz1']
+    msg.qx0 = d['Qx0']
+    msg.qx1 = d['Qx1']
+    msg.qy0 = d['Qy0']
+    msg.qy1 = d['Qy1']
+    msg.qz0 = d['Qz0']
+    msg.qz1 = d['Qz1']
+    msg.qw0 = d['Qw0']
+    msg.qw1 = d['Qw1']
+    msg.buttonstate0 = d['buttonstate0']
+    msg.buttonstate1 = d['buttonstate1']
+    msg.grasp0 = d['grasp0']
+    msg.grasp1 = d['grasp1']
+    msg.surgeon_mode = d['surgeon_mode']
+    msg.checksum = d['checksum']
+    return msg
 
 
 
