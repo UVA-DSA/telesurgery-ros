@@ -79,7 +79,7 @@ class ConsoleReplay(Node):
                                        dest_port=self.get_parameter('udp_port').get_parameter_value().integer_value)
         elif mode.lower() == 'ros' or mode.lower() == 'ros2':
             self.get_logger().info("Starting replay on ROS")
-            pass
+            self.replay_obj.replay(None)
 
 def main(args=None) -> None:
     try:
