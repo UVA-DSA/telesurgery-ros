@@ -18,7 +18,7 @@ class replayoverport:
     def stop(self):
         self._stop_event.set()
 
-    def replay_log(self, dest_ip):
+    def replay_log(self, dest_ip, dest_port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(1.0)  # ← prevents blocking forever on send
         packet_count = 0
@@ -51,7 +51,7 @@ class replayoverport:
                     break
 
                 system_time = time.time()
-                sock.sendto(data, (dest_ip, self.RECEIVER_PORT))  # ← was RECEIVER_PORT
+                sock.sendto(data, (dest_ip, dest_port))  # ← was RECEIVER_PORT
                 packet_count += 1
                 previous_time = current_packet_time
 

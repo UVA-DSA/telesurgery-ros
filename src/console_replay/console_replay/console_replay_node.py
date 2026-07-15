@@ -20,12 +20,14 @@ class ConsoleReplay(Node):
 
         self.init_parameters()
 
-        # todo hardcoded, need to add ros2 configuration files
         data_file_path = os.path.join(
             package_share_dir,
             'replay_files',
-            'console_data_complete_7.bin'
+            self.get_parameter('data_file_name').get_parameter_value().string_value
         )
+
+        if not os.path.isfile(data_file_path):
+            raise FileNotFoundError(f"Replay file {data_file_path} not found")
 
         self.replay_obj = replayoverport(filepath=data_file_path)
 
@@ -70,8 +72,14 @@ class ConsoleReplay(Node):
 
     def start(self, msg: Bool):
         if not msg.data: return
-        self.get_logger().info("Starting replay")
-        self.replay_obj.replay_log(dest_ip='127.0.0.1')
+        mode = self.get_parameter('output_mode').get_parameter_value().string_value
+        if mode.lower() == 'udp':
+            self.get_logger().info("Starting replay on UDP")
+            self.replay_obj.replay_log(dest_ip=self.get_parameter('udp_ip').get_parameter_value().string_value,
+                                       dest_port=self.get_parameter('udp_port').get_parameter_value().integer_value)
+        elif mode.lower() == 'ros' or mode.lower() == 'ros2':
+            self.get_logger().info("Starting replay on ROS")
+            pass
 
 def main(args=None) -> None:
     try:
