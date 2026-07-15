@@ -39,10 +39,9 @@ class ConsoleReplay(Node):
     def init_parameters(self):
         data_file_path_descriptor = ParameterDescriptor(
             type=rclpy.Parameter.Type.STRING,
-            read_only=True,
-            description='File name of replay data - must be placed in replay_files directory'
+            description='File name of replay data - must be in in replay_files directory'
         )
-        self.declare_parameter('data_file_name', descriptor=data_file_path_descriptor)
+        self.declare_parameter('data_file_name', '', descriptor=data_file_path_descriptor)
 
         output_mode_descriptor = ParameterDescriptor(
             type=rclpy.Parameter.Type.STRING,
