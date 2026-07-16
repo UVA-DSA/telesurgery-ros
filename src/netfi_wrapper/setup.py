@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'psm_netfi'
+package_name = 'netfi_wrapper'
 
 setup(
     name=package_name,
@@ -25,7 +25,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'psm_netfi = psm_netfi.psm_netfi:main'
+            'netfi_wrapper = netfi_wrapper.netfi_wrapper:main'
         ],
     },
 )

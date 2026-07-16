@@ -1,3 +1,6 @@
 [submodule "src/surrol_wrapper/surrol_wrapper/telesurgery-qos-analysis"]
 	path = src/surrol_wrapper/telesurgery_qos_analysis
 	url = https://github.com/UVA-DSA/telesurgery-qos-analysis
+[submodule "src/netfi_wrapper/NetFI"]
+	path = src/netfi_wrapper/NetFI
+	url = https://github.com/UVA-DSA/NetFI
