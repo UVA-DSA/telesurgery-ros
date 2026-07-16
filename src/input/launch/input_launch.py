@@ -10,9 +10,9 @@ def get_share_file(package_name, file_path):
 def generate_launch_description():
     return LaunchDescription([
         Node(
-            package='console_replay',
-            executable='console_replay',
-            name='console_replay',
-            parameters=[get_share_file("console_replay", "param/default.yaml")]
+            package='input',
+            executable='input',
+            name='input',
+            parameters=[get_share_file("input", "param/default.yaml")]
         ),
     ])

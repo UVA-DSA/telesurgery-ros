@@ -37,7 +37,9 @@ class ConsoleReplay(Node):
             10
         )
 
-        self.itp_raw_publisher = self.create_publisher(ITPRaw, 'itp_commands_raw', 100)
+        self.itp_raw_publisher = self.create_publisher(ITPRaw,
+                                                       self.get_parameter('ros_topic_name').get_parameter_value().string_value,
+                                                       100)
 
     def init_parameters(self):
         data_file_path_descriptor = ParameterDescriptor(
@@ -82,7 +84,7 @@ class ConsoleReplay(Node):
                                        dest_port=self.get_parameter('udp_port').get_parameter_value().integer_value)
         elif mode.lower() == 'ros' or mode.lower() == 'ros2':
             self.get_logger().info("Starting replay on ROS")
-            self.replay_obj.replay(self.itp_raw_publisher)
+            self.replay_obj.replay_ros(self.itp_raw_publisher)
         else:
             raise KeyError(f"Unsupported mode: {mode}")
 

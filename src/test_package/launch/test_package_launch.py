@@ -20,11 +20,13 @@ def generate_launch_description():
             )
         ),
 
-        Node(
-            package='input',
-            executable='input',
-            name='input',
-            arguments=[]
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="input",
+                    file_path="launch/input_launch.py"
+                )
+            )
         ),
 
         Node(
