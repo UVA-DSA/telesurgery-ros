@@ -1,28 +1,23 @@
-# take a path to a binary file, reads packets, sends to 5001 port
-
-import os
 import struct
 import lz4.frame
 import socket
 import time
 import threading
-from collections import namedtuple
 
 import rclpy.publisher
 from teleop_msgs.msg import ITPRaw
 
-
-class replayoverport:
-    def __init__(self, filepath):
-        self.EMULATOR_PORT = 36000   # ← send HERE, not to 5001
-        self.RECEIVER_PORT = 5001
+# This is an altered version of replay.py from the telesurgery-qos-analysis repository
+class Replay:
+    def __init__(self, filepath, node):
+        self.node: rclpy.node.Node = node
         self.filepath = filepath
         self._stop_event = threading.Event()
 
     def stop(self):
         self._stop_event.set()
 
-    def replay_log(self, dest_ip, dest_port):
+    def replay_udp(self, dest_ip, dest_port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(1.0)  # ← prevents blocking forever on send
         packet_count = 0
@@ -60,12 +55,12 @@ class replayoverport:
                 previous_time = current_packet_time
 
         sock.close()
-        print(f"Replay finished. Sent {packet_count} packets.")
+        self.node.get_logger().info(f"Replay finished. Sent {packet_count} packets.")
         total_time = time.time() - start_time
         if total_time > 0:
-            print(f"Average frequency: {packet_count / total_time:.2f} Hz")
+            self.node.get_logger().info(f"Average frequency: {packet_count / total_time:.2f} Hz")
 
-    def replay(self, publisher: rclpy.node.Publisher):
+    def replay_ros(self, publisher: rclpy.node.Publisher):
         packet_count = 0
         with lz4.frame.open(self.filepath, 'rb') as f:
             previous_time = 0
@@ -99,3 +94,4 @@ class replayoverport:
                 publisher.publish(msg)
                 packet_count += 1
                 previous_time = current_packet_time
+        self.node.get_logger().info(f"Replay finished. Sent {packet_count} packets.")

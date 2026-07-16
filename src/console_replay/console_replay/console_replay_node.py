@@ -8,11 +8,9 @@ from std_msgs.msg import Bool
 from rcl_interfaces.msg import ParameterDescriptor
 
 from teleop_msgs.msg import ITPRaw
-from .replay import replayoverport
+from .replay import Replay
 
 
-## This node wraps replay.py from the telesurgery-qos-analysis repository.
-## It sends packets over UDP, not over ROS2.
 class ConsoleReplay(Node):
 
     def __init__(self):
@@ -30,7 +28,7 @@ class ConsoleReplay(Node):
         if not os.path.isfile(data_file_path):
             raise FileNotFoundError(f"Replay file {data_file_path} not found")
 
-        self.replay_obj = replayoverport(filepath=data_file_path)
+        self.replay_obj = Replay(filepath=data_file_path, node=self)
 
         self.subscription = self.create_subscription(
             Bool,
@@ -74,11 +72,13 @@ class ConsoleReplay(Node):
 
 
     def start(self, msg: Bool):
+        # Wait for a message to be sent to the /replay_start topic
         if not msg.data: return
+
         mode = self.get_parameter('output_mode').get_parameter_value().string_value
         if mode.lower() == 'udp':
             self.get_logger().info("Starting replay on UDP")
-            self.replay_obj.replay_log(dest_ip=self.get_parameter('udp_ip').get_parameter_value().string_value,
+            self.replay_obj.replay_udp(dest_ip=self.get_parameter('udp_ip').get_parameter_value().string_value,
                                        dest_port=self.get_parameter('udp_port').get_parameter_value().integer_value)
         elif mode.lower() == 'ros' or mode.lower() == 'ros2':
             self.get_logger().info("Starting replay on ROS")
