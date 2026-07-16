@@ -4,7 +4,7 @@ from typing import List
 from teleop_msgs.msg import ITP, ITPRaw
 
 
-def to_msg(d) -> ITP:
+def to_msg(d: dict) -> ITP:
     msg: ITP = ITP()
     msg.sequence = d['sequence']
     msg.pactyp = d['pactyp']
@@ -59,12 +59,16 @@ def to_dict(msg: ITP):
     return d
 
 def raw_to_dict(msg: ITPRaw):
-    format_str = '<IIIiiiiiiddddddddiiiiii'
-    fields = 'sequence pactyp version delx0 delx1 dely0 dely1 delz0 delz1 Qx0 Qx1 Qy0 Qy1 Qz0 Qz1 Qw0 Qw1 buttonstate0 buttonstate1 grasp0 grasp1 surgeon_mode checksum'.split()
-    UStruct = namedtuple('UStruct', fields)
-
     data: List[bytes] = msg.data
     raw_bytes = b''.join(data)
-    unpacked_data = struct.unpack(format_str, raw_bytes)
+    return bytes_to_dict(raw_bytes)
+
+
+format_str = '<IIIiiiiiiddddddddiiiiii'
+fields = 'sequence pactyp version delx0 delx1 dely0 dely1 delz0 delz1 Qx0 Qx1 Qy0 Qy1 Qz0 Qz1 Qw0 Qw1 buttonstate0 buttonstate1 grasp0 grasp1 surgeon_mode checksum'.split()
+UStruct = namedtuple('UStruct', fields)
+
+def bytes_to_dict(data: bytes):
+    unpacked_data = struct.unpack(format_str, data)
     u_struct = UStruct(*unpacked_data)
     return u_struct._asdict()

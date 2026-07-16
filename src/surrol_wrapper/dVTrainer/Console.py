@@ -8,6 +8,7 @@ from collections import namedtuple
 
 from pandas.core.methods.to_dict import to_dict
 
+from teleop_msgs_helpers import ITP_helpers
 from .data_collector import DataLogger
 from .random_experiment_new import user_num
 
@@ -76,33 +77,6 @@ class Console:
     def itp_callback(self, msg: ITP):
         self.udp_queue.put(msg)
 
-    def to_dict(self, msg: ITP):
-        d = dict()
-        d['sequence'] = msg.sequence
-        d['pactyp'] = msg.pactyp
-        d['version'] = msg.version
-        d['delx0'] = msg.delx0
-        d['delx1'] = msg.delx1
-        d['dely0'] = msg.dely0
-        d['dely1'] = msg.dely1
-        d['delz0'] = msg.delz0
-        d['delz1'] = msg.delz1
-        d['Qx0'] = msg.qx0
-        d['Qx1'] = msg.qx1
-        d['Qy0'] = msg.qy0
-        d['Qy1'] = msg.qy1
-        d['Qz0'] = msg.qz0
-        d['Qz1'] = msg.qz1
-        d['Qw0'] = msg.qw0
-        d['Qw1'] = msg.qw1
-        d['buttonstate0'] = msg.buttonstate0
-        d['buttonstate1'] = msg.buttonstate1
-        d['grasp0'] = msg.grasp0
-        d['grasp1'] = msg.grasp1
-        d['surgeon_mode'] = msg.surgeon_mode
-        d['checksum'] = msg.checksum
-        return d
-
     def start_receive_thread(self):
         """Start listening for UDP packets in a separate thread."""
         self.receieve_thread = threading.Thread(target=self.receive_udp_packets, daemon=True)
@@ -141,7 +115,7 @@ class Console:
             if command is None:
                 break
             if not isinstance(command, dict):
-                command: dict = self.to_dict(command)
+                command: dict = ITP_helpers.to_dict(command)
                 
             delta_position0, delta_orientation0, delta_grasp0= self.get_psm_vars(command, 0)
             delta_position1, delta_orientation1, delta_grasp1 = self.get_psm_vars(command, 1)
