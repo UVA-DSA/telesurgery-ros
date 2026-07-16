@@ -1,8 +1,9 @@
-from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = 'test_package'
+from setuptools import find_packages, setup
+
+package_name = 'network_interface'
 
 setup(
     name=package_name,
@@ -12,6 +13,8 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'param'), glob('param/*')),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*')),
     ],
     package_data={'': ['py.typed']},
     install_requires=['setuptools'],
@@ -27,9 +30,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            # executable-name = package-name.node-name:function
-            'talker = test_package.minimal_publisher:main',
-            'listener = test_package.minimal_subscriber:main',
+            'network_interface = network_interface.network_interface:main'
         ],
     },
 )

@@ -10,9 +10,9 @@ def get_share_file(package_name, file_path):
 def generate_launch_description():
     return LaunchDescription([
         Node(
-            package='console_replay',
-            executable='console_replay',
-            name='console_replay',
-            parameters=[get_share_file("console_replay", "param/default.yaml")]
+            package='network_interface',
+            executable='network_interface',
+            name='network_interface',
+            parameters=[get_share_file("network_interface", "param/ros.yaml")]
         ),
     ])

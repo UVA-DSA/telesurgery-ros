@@ -3,7 +3,6 @@
     data_file_name: 'console_data_complete_7.bin'
     output_mode: ROS
     ros_topic_name: /itp_commands_raw
-    start_type_description_service: true
     udp_ip: 127.0.0.1
     udp_port: 5001
 

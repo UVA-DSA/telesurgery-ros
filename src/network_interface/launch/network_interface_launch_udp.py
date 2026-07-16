@@ -10,9 +10,9 @@ def get_share_file(package_name, file_path):
 def generate_launch_description():
     return LaunchDescription([
         Node(
-            package='input',
-            executable='input',
-            name='input',
-            parameters=[get_share_file("input", "param/default.yaml")]
+            package='network_interface',
+            executable='network_interface',
+            name='network_interface',
+            parameters=[get_share_file("network_interface", "param/udp.yaml")]
         ),
     ])

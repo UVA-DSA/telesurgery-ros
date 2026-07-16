@@ -14,10 +14,10 @@ from rclpy.node import Node
 from teleop_msgs.msg import ITP, ITPRaw
 from teleop_msgs_helpers import ITP_helpers
 
-class Input(Node):
+class NetworkInterface(Node):
 
     def __init__(self):
-        super().__init__('input')
+        super().__init__('network_interface')
 
         self.init_parameters()
 
@@ -118,20 +118,20 @@ class Input(Node):
 def main(args=None) -> None:
     try:
         with rclpy.init(args=args):
-            input_node = Input()
+            node = NetworkInterface()
 
-            mode = input_node.get_parameter('input_mode').get_parameter_value().string_value.lower()
+            mode = node.get_parameter('input_mode').get_parameter_value().string_value.lower()
             if mode == 'ros':
-                input_node.init_ros_listener()
+                node.init_ros_listener()
             elif mode == 'udp':
-                input_node.init_sock_udp()
-                input_node.listen_thread.start()
+                node.init_sock_udp()
+                node.listen_thread.start()
             else:
                 raise KeyError(f"Unsupported mode: {mode}")
 
-            input_node.publish_thread.start()
+            node.publish_thread.start()
 
-            rclpy.spin(input_node)
+            rclpy.spin(node)
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
 
