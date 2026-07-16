@@ -23,8 +23,8 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 get_share_file(
-                    package_name="input",
-                    file_path="launch/input_launch.py"
+                    package_name="network_interface",
+                    file_path="launch/network_interface_launch.py"
                 )
             )
         ),

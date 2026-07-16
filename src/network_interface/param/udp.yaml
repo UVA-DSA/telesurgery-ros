@@ -1,6 +1,6 @@
-/input:
+/network_interface:
   ros__parameters:
-    input_mode: 'ROS'
+    input_mode: 'UDP'
     listen_topic_name: /itp_commands_raw
     publish_topic_name: /itp_commands
     udp_ip: 127.0.0.1

@@ -3,7 +3,7 @@ from glob import glob
 
 from setuptools import find_packages, setup
 
-package_name = 'input'
+package_name = 'network_interface'
 
 setup(
     name=package_name,
@@ -30,7 +30,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'input = input.input_node:main'
+            'network_interface = network_interface.network_interface:main'
         ],
     },
 )
