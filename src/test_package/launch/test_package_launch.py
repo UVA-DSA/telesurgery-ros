@@ -1,21 +1,32 @@
+import os
+
+from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
+
+def get_share_file(package_name, file_path):
+    return os.path.join(get_package_share_directory(package_name), file_path)
 
 def generate_launch_description():
     return LaunchDescription([
-        Node(
-            package='console_replay',
-            executable='console_replay',
-            name='console_replay_node',
-            # todo this is for something important, don't know what yet
-            arguments=[]
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="console_replay",
+                    file_path="launch/console_replay_launch.py"
+                )
+            )
         ),
 
-        Node(
-            package='input',
-            executable='input',
-            name='input_node',
-            arguments=[]
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="input",
+                    file_path="launch/input_launch.py"
+                )
+            )
         ),
 
         Node(

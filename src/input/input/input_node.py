@@ -7,35 +7,65 @@ from collections import namedtuple
 from queue import Queue
 
 import rclpy
+from rcl_interfaces.msg import ParameterDescriptor
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
-from teleop_msgs.msg import ITP
+from teleop_msgs.msg import ITP, ITPRaw
+from teleop_msgs_helpers import ITP_helpers
 
-## Converts raw packets into ITP ROS messages
-## Currently assumes that the raw packets are coming in through UDP.
-## I am not sure if this should instead accept a ROS message representation of the packets
 class Input(Node):
 
     def __init__(self):
         super().__init__('input')
 
+        self.init_parameters()
+
         self.itp_publisher = self.create_publisher(ITP, '/itp_commands', 100)
+        self.subscription = None
         self.sock = None
-        self.ip = '127.0.0.1'
-        self.port = 5001
+        self.ip = self.get_parameter('udp_ip').get_parameter_value().string_value
+        self.port = self.get_parameter('udp_port').get_parameter_value().integer_value
         self.udp_queue: Queue = queue.Queue()
 
         self.fields = 'sequence pactyp version delx0 delx1 dely0 dely1 delz0 delz1 Qx0 Qx1 Qy0 Qy1 Qz0 Qz1 Qw0 Qw1 buttonstate0 buttonstate1 grasp0 grasp1 surgeon_mode checksum'.split()
         self.UStruct = namedtuple('UStruct', self.fields)
         self.format_str = '<IIIiiiiiiddddddddiiiiii'
 
-        self.init_sock_udp()
         self.publish_thread = threading.Thread(target=self.publish_itp, daemon=True)
-        self.publish_thread.start()
-
         self.listen_thread = threading.Thread(target=self.udp_listener, daemon=True)
-        self.listen_thread.start()
+
+    def init_parameters(self):
+        input_mode_descriptor = ParameterDescriptor(
+            type=rclpy.Parameter.Type.STRING,
+            description='Mode of listening to input: either ROS or UDP'
+        )
+        self.declare_parameter('input_mode', '', input_mode_descriptor)
+
+        ros_topic_descriptor = ParameterDescriptor(
+            type=rclpy.Parameter.Type.STRING,
+            description='ROS topic name to listen to'
+        )
+        self.declare_parameter('listen_topic_name', '/itp_commands_raw', descriptor=ros_topic_descriptor)
+
+        ros_topic_descriptor = ParameterDescriptor(
+            type=rclpy.Parameter.Type.STRING,
+            description='ROS topic name to publish to'
+        )
+        self.declare_parameter('publish_topic_name', '/itp_commands', descriptor=ros_topic_descriptor)
+
+        # todo maybe make these parameters global so we can just read these from the console_replay node
+        udp_ip_descriptor = ParameterDescriptor(
+            type=rclpy.Parameter.Type.STRING,
+            description='UDP IP address to set up a server on'
+        )
+        self.declare_parameter('udp_ip', '127.0.0.1', descriptor=udp_ip_descriptor)
+
+        udp_port_descriptor = ParameterDescriptor(
+            type=rclpy.Parameter.Type.INTEGER,
+            description='UDP port number to set up a server on'
+        )
+        self.declare_parameter('udp_port', 5001, descriptor=udp_port_descriptor)
 
     def init_sock_udp(self):
         # Create a UDP socket and the data struct ----------------------------------------------------
@@ -45,14 +75,24 @@ class Input(Node):
         self.get_logger().info(f"Initialized a UDP server on IP: {self.ip} and port: {self.port}")
         self.get_logger().info("Listening for incoming data:")
 
+    def init_ros_listener(self):
+        self.subscription = self.create_subscription(
+            ITPRaw,
+            self.get_parameter('listen_topic_name').get_parameter_value().string_value,
+            self.itp_raw_callback,
+            100
+        )
+
+    def itp_raw_callback(self, msg: ITPRaw):
+        command = ITP_helpers.raw_to_dict(msg)
+        self.udp_queue.put(command)
+
     def udp_listener(self):
         # Taken from Console.py
         while True:
             try:
                 data, addr = self.sock.recvfrom(1024)  # Buffer size of 1024 bytes
-                unpacked_data = struct.unpack(self.format_str, data)
-                u_struct = self.UStruct(*unpacked_data)
-                command = u_struct._asdict()
+                command = ITP_helpers.bytes_to_dict(data)
                 self.udp_queue.put(command)
 
             except socket.timeout:
@@ -65,40 +105,13 @@ class Input(Node):
                 break
             except Exception as e:
                 self.get_logger().error(f"Error receiving packet: {e}")
+                # self.get_logger().error(traceback.format_exc())
 
     def publish_itp(self):
         while True:
             command = self.udp_queue.get()
-            msg = self.to_msg(command)
+            msg = ITP_helpers.to_msg(command)
             self.itp_publisher.publish(msg)
-
-
-    def to_msg(self, d) -> ITP:
-        msg: ITP = ITP()
-        msg.sequence = d['sequence']
-        msg.pactyp = d['pactyp']
-        msg.version = d['version']
-        msg.delx0 = d['delx0']
-        msg.delx1 = d['delx1']
-        msg.dely0 = d['dely0']
-        msg.dely1 = d['dely1']
-        msg.delz0 = d['delz0']
-        msg.delz1 = d['delz1']
-        msg.qx0 = d['Qx0']
-        msg.qx1 = d['Qx1']
-        msg.qy0 = d['Qy0']
-        msg.qy1 = d['Qy1']
-        msg.qz0 = d['Qz0']
-        msg.qz1 = d['Qz1']
-        msg.qw0 = d['Qw0']
-        msg.qw1 = d['Qw1']
-        msg.buttonstate0 = d['buttonstate0']
-        msg.buttonstate1 = d['buttonstate1']
-        msg.grasp0 = d['grasp0']
-        msg.grasp1 = d['grasp1']
-        msg.surgeon_mode = d['surgeon_mode']
-        msg.checksum = d['checksum']
-        return msg
 
 
 
@@ -106,6 +119,17 @@ def main(args=None) -> None:
     try:
         with rclpy.init(args=args):
             input_node = Input()
+
+            mode = input_node.get_parameter('input_mode').get_parameter_value().string_value.lower()
+            if mode == 'ros':
+                input_node.init_ros_listener()
+            elif mode == 'udp':
+                input_node.init_sock_udp()
+                input_node.listen_thread.start()
+            else:
+                raise KeyError(f"Unsupported mode: {mode}")
+
+            input_node.publish_thread.start()
 
             rclpy.spin(input_node)
     except (KeyboardInterrupt, ExternalShutdownException):
