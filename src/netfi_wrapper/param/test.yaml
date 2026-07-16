@@ -1,0 +1,7 @@
+/netfi_wrapper:
+  ros__parameters:
+    emulator_port: 36000
+    receiver_port: 5001
+    start_type_description_service: true
+    use_sim_time: false
+
