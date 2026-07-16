@@ -15,7 +15,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(
                 get_share_file(
                     package_name="console_replay",
-                    file_path="launch/console_replay_launch.py"
+                    file_path="launch/console_replay_launch_ros.py"
                 )
             )
         ),
@@ -24,7 +24,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(
                 get_share_file(
                     package_name="network_interface",
-                    file_path="launch/network_interface_launch.py"
+                    file_path="launch/network_interface_launch_ros.py"
                 )
             )
         ),

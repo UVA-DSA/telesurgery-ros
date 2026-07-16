@@ -13,6 +13,6 @@ def generate_launch_description():
             package='network_interface',
             executable='network_interface',
             name='network_interface',
-            parameters=[get_share_file("network_interface", "param/default.yaml")]
+            parameters=[get_share_file("network_interface", "param/udp.yaml")]
         ),
     ])
