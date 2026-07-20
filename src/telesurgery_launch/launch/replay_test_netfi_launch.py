@@ -23,15 +23,6 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 get_share_file(
-                    package_name="netfi_wrapper",
-                    file_path="launch/netfi_launch_test_delay.py"
-                )
-            )
-        ),
-
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                get_share_file(
                     package_name="network_interface",
                     file_path="launch/network_interface_launch_udp.py"
                 )
