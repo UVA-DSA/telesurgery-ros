@@ -4,6 +4,8 @@ from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
 from network_interface.data_flow import DataFlow
+from network_interface.fault_injector import FaultInjector
+
 
 class NetworkInterface(Node):
 
@@ -13,8 +15,11 @@ class NetworkInterface(Node):
         self.init_parameters()
 
         self.data_flow = DataFlow(self)
+        self.fault_injector = FaultInjector(self)
 
     def init_parameters(self):
+        ### DATA FLOW
+
         input_mode_descriptor = ParameterDescriptor(
             type=rclpy.Parameter.Type.STRING,
             description='Mode of listening to input: either ROS or UDP'
@@ -45,11 +50,27 @@ class NetworkInterface(Node):
         )
         self.declare_parameter('data_flow.udp_port', 5001, descriptor=udp_port_descriptor)
 
+        ### FAULT INJECTOR
+
+        data_file_path_descriptor = ParameterDescriptor(
+            type=rclpy.Parameter.Type.INTEGER,
+            description='Port to listen on for fault injection'
+        )
+        self.declare_parameter('fault_injector.emulator_port', 36000, descriptor=data_file_path_descriptor)
+
+        data_file_path_descriptor = ParameterDescriptor(
+            type=rclpy.Parameter.Type.INTEGER,
+            description='Port to send to for fault injection'
+        )
+        self.declare_parameter('fault_injector.receiver_port', 5001, descriptor=data_file_path_descriptor)
+
 
 def main(args=None) -> None:
     try:
         with rclpy.init(args=args):
             node = NetworkInterface()
+
+            node.fault_injector.delay.start()
 
             mode = node.get_parameter('data_flow.input_mode').get_parameter_value().string_value.lower()
             if mode == 'ros':
