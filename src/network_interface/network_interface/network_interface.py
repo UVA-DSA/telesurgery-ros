@@ -19,32 +19,31 @@ class NetworkInterface(Node):
             type=rclpy.Parameter.Type.STRING,
             description='Mode of listening to input: either ROS or UDP'
         )
-        self.declare_parameter('input_mode', '', input_mode_descriptor)
+        self.declare_parameter('data_flow.input_mode', '', input_mode_descriptor)
 
         ros_topic_descriptor = ParameterDescriptor(
             type=rclpy.Parameter.Type.STRING,
             description='ROS topic name to listen to'
         )
-        self.declare_parameter('listen_topic_name', '/itp_commands_raw', descriptor=ros_topic_descriptor)
+        self.declare_parameter('data_flow.listen_topic_name', '/itp_commands_raw', descriptor=ros_topic_descriptor)
 
         ros_topic_descriptor = ParameterDescriptor(
             type=rclpy.Parameter.Type.STRING,
             description='ROS topic name to publish to'
         )
-        self.declare_parameter('publish_topic_name', '/itp_commands', descriptor=ros_topic_descriptor)
+        self.declare_parameter('data_flow.publish_topic_name', '/itp_commands', descriptor=ros_topic_descriptor)
 
-        # todo maybe make these parameters global so we can just read these from the console_replay node
         udp_ip_descriptor = ParameterDescriptor(
             type=rclpy.Parameter.Type.STRING,
             description='UDP IP address to set up a server on'
         )
-        self.declare_parameter('udp_ip', '127.0.0.1', descriptor=udp_ip_descriptor)
+        self.declare_parameter('data_flow.udp_ip', '127.0.0.1', descriptor=udp_ip_descriptor)
 
         udp_port_descriptor = ParameterDescriptor(
             type=rclpy.Parameter.Type.INTEGER,
             description='UDP port number to set up a server on'
         )
-        self.declare_parameter('udp_port', 5001, descriptor=udp_port_descriptor)
+        self.declare_parameter('data_flow.udp_port', 5001, descriptor=udp_port_descriptor)
 
 
 def main(args=None) -> None:
@@ -52,7 +51,7 @@ def main(args=None) -> None:
         with rclpy.init(args=args):
             node = NetworkInterface()
 
-            mode = node.get_parameter('input_mode').get_parameter_value().string_value.lower()
+            mode = node.get_parameter('data_flow.input_mode').get_parameter_value().string_value.lower()
             if mode == 'ros':
                 node.data_flow.init_ros_listener()
             elif mode == 'udp':

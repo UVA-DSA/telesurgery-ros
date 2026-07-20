@@ -15,8 +15,8 @@ class DataFlow:
         self.itp_publisher = self.node.create_publisher(ITP, '/itp_commands', 100)
         self.subscription = None
         self.sock = None
-        self.ip = self.node.get_parameter('udp_ip').get_parameter_value().string_value
-        self.port = self.node.get_parameter('udp_port').get_parameter_value().integer_value
+        self.ip = self.node.get_parameter('data_flow.udp_ip').get_parameter_value().string_value
+        self.port = self.node.get_parameter('data_flow.udp_port').get_parameter_value().integer_value
         self.udp_queue: Queue = queue.Queue()
 
         self.publish_thread = threading.Thread(target=self.publish_itp, daemon=True)
@@ -34,7 +34,7 @@ class DataFlow:
     def init_ros_listener(self):
         self.subscription = self.node.create_subscription(
             ITPRaw,
-            self.node.get_parameter('listen_topic_name').get_parameter_value().string_value,
+            self.node.get_parameter('data_flow.listen_topic_name').get_parameter_value().string_value,
             self.itp_raw_callback,
             100
         )
