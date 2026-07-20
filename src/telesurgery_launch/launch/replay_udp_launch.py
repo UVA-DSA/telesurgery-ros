@@ -27,9 +27,12 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(
                 get_share_file(
                     package_name="network_interface",
-                    file_path="launch/network_interface_launch_udp.py"
+                    file_path="launch/network_interface_launch.py"
                 )
-            )
+            ),
+            launch_arguments={
+                'config': 'udp'
+            }.items(),
         ),
 
         Node(
