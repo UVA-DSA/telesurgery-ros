@@ -52,17 +52,23 @@ class NetworkInterface(Node):
 
         ### FAULT INJECTOR
 
-        data_file_path_descriptor = ParameterDescriptor(
+        enabled_descriptor = ParameterDescriptor(
+            type=rclpy.Parameter.Type.BOOL,
+            description='Whether the fault injector should be enabled or not'
+        )
+        self.declare_parameter('fault_injector.enabled', False, descriptor=enabled_descriptor)
+
+        port_listen_descriptor = ParameterDescriptor(
             type=rclpy.Parameter.Type.INTEGER,
             description='Port to listen on for fault injection'
         )
-        self.declare_parameter('fault_injector.emulator_port', 36000, descriptor=data_file_path_descriptor)
+        self.declare_parameter('fault_injector.emulator_port', 36000, descriptor=port_listen_descriptor)
 
-        data_file_path_descriptor = ParameterDescriptor(
+        port_receive_descriptor = ParameterDescriptor(
             type=rclpy.Parameter.Type.INTEGER,
             description='Port to send to for fault injection'
         )
-        self.declare_parameter('fault_injector.receiver_port', 5001, descriptor=data_file_path_descriptor)
+        self.declare_parameter('fault_injector.receiver_port', 5001, descriptor=port_receive_descriptor)
 
 
 def main(args=None) -> None:
@@ -70,7 +76,9 @@ def main(args=None) -> None:
         with rclpy.init(args=args):
             node = NetworkInterface()
 
-            node.fault_injector.delay.start()
+            if node.get_parameter('fault_injector.enabled').get_parameter_value().bool_value:
+                node.get_logger().info("Initializing fault injector")
+                node.fault_injector.start_delay()
 
             mode = node.get_parameter('data_flow.input_mode').get_parameter_value().string_value.lower()
             if mode == 'ros':

@@ -1,18 +1,18 @@
 import rclpy
-from netfi.emulators import PacketLossEmulator, DelayEmulator
-from rcl_interfaces.msg import ParameterDescriptor
-from rclpy.executors import ExternalShutdownException
-from rclpy.node import Node
+from netfi.emulators import DelayEmulator
 
 
 class FaultInjector:
 
-    def __init__(self, node: rclpy.Node):
+    def __init__(self, node: rclpy.node.Node):
         self.node: rclpy.Node = node
 
         self.emulator_port = self.node.get_parameter('fault_injector.emulator_port').get_parameter_value().integer_value
         self.receiver_port = self.node.get_parameter('fault_injector.receiver_port').get_parameter_value().integer_value
 
+        self.delay = None
+
+    def start_delay(self):
         # For now, let's run the delay emulator just to verify it works
         delay_params = {
             'lower_bound': 7.5,
@@ -23,5 +23,5 @@ class FaultInjector:
             '5G': delay_params
         }
 
-        self.delay = DelayEmulator(input_port=self.emulator_port, output_port=self.receiver_port, network_type='4G',
+        self.delay = DelayEmulator(input_port=self.emulator_port, output_port=self.receiver_port, network_type='5G',
                                    params=actual_params, protocol='udp')

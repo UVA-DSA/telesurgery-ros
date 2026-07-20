@@ -7,6 +7,6 @@
       udp_ip: 127.0.0.1
       udp_port: 5001
     fault_injector:
-      enabled: false
+      enabled: true
       emulator_port: 36000
       receiver_port: 5001
