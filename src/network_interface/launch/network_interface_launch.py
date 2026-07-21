@@ -32,4 +32,10 @@ def generate_launch_description():
             name='network_interface',
             parameters=[config_file_path]
         ),
+        Node(
+            package='network_interface',
+            executable='netfi_wrapper',
+            name='netfi_wrapper',
+            parameters=[config_file_path]
+        )
     ])

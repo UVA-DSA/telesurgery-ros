@@ -6,8 +6,9 @@
       publish_topic_name: /itp_commands
       udp_ip: 127.0.0.1
       udp_port: 5001
-    fault_injector:
-      enabled: false
-      emulator_port: 36000
-      receiver_port: 5001
+/**:
+  ros__parameters:
+    enable_fault_injector: false
+    fault_injector_in_topic: /netfi_in
+    fault_injector_out_topic: /netfi_out
 

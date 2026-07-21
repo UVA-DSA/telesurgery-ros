@@ -15,7 +15,6 @@ class NetworkInterface(Node):
         self.init_parameters()
 
         self.data_flow = DataFlow(self)
-        self.fault_injector = FaultInjector(self)
 
     def init_parameters(self):
         ### DATA FLOW
@@ -52,23 +51,9 @@ class NetworkInterface(Node):
 
         ### FAULT INJECTOR
 
-        enabled_descriptor = ParameterDescriptor(
-            type=rclpy.Parameter.Type.BOOL,
-            description='Whether the fault injector should be enabled or not'
-        )
-        self.declare_parameter('fault_injector.enabled', False, descriptor=enabled_descriptor)
-
-        port_listen_descriptor = ParameterDescriptor(
-            type=rclpy.Parameter.Type.INTEGER,
-            description='Port to listen on for fault injection'
-        )
-        self.declare_parameter('fault_injector.emulator_port', 36000, descriptor=port_listen_descriptor)
-
-        port_receive_descriptor = ParameterDescriptor(
-            type=rclpy.Parameter.Type.INTEGER,
-            description='Port to send to for fault injection'
-        )
-        self.declare_parameter('fault_injector.receiver_port', 5001, descriptor=port_receive_descriptor)
+        self.declare_parameter('enable_fault_injector', False)
+        self.declare_parameter('fault_injector_in_topic', 'netfi_in')
+        self.declare_parameter('fault_injector_out_topic', 'netfi_out')
 
 
 def main(args=None) -> None:
@@ -76,18 +61,20 @@ def main(args=None) -> None:
         with rclpy.init(args=args):
             node = NetworkInterface()
 
-            if node.get_parameter('fault_injector.enabled').get_parameter_value().bool_value:
-                node.get_logger().info("Initializing fault injector")
-                node.fault_injector.start_delay()
-
             mode = node.get_parameter('data_flow.input_mode').get_parameter_value().string_value.lower()
+            fault_injector_enabled = node.get_parameter('enable_fault_injector').get_parameter_value().bool_value
+            node.get_logger().info(f"Starting in {mode} mode")
+
             if mode == 'ros':
-                node.data_flow.init_ros_listener()
+                pass
             elif mode == 'udp':
                 node.data_flow.init_sock_udp()
                 node.data_flow.listen_thread.start()
             else:
                 raise KeyError(f"Unsupported mode: {mode}")
+
+            if fault_injector_enabled:
+                node.data_flow.publish_fault_injector_thread.start()
 
             node.data_flow.publish_thread.start()
 

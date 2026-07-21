@@ -30,7 +30,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'network_interface = network_interface.network_interface:main'
+            'network_interface = network_interface.network_interface:main',
+            'netfi_wrapper = netfi_wrapper.fault_injector:main'
         ],
     },
 )
