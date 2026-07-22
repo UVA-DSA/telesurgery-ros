@@ -4,6 +4,8 @@ import threading
 from queue import Queue
 
 import rclpy
+
+from network_interface.network_interface.packet_writer import PacketWriter
 from teleop_msgs.msg import ITPRaw, ITP
 from teleop_msgs_helpers import ITP_helpers
 
@@ -12,6 +14,7 @@ class DataFlow:
     def __init__(self, node: rclpy.node.Node):
         self.node: rclpy.Node = node
         self.fault_injector_enabled = node.get_parameter('enable_fault_injector').get_parameter_value().bool_value
+        self.logger: PacketWriter = None
 
         self.itp_publisher = self.node.create_publisher(ITP, '/itp_commands', 100)
         self.subscription = self.node.create_subscription(
@@ -55,6 +58,9 @@ class DataFlow:
         else:
             self.udp_queue.put(command)
 
+        if self.logger is not None:
+            self.logger.process_packets(msg.data)
+
     def publish_to_fault_injector(self):
         while True:
             command = self.fault_injector_queue.get()
@@ -74,6 +80,9 @@ class DataFlow:
                     self.fault_injector_queue.put(command)
                 else:
                     self.udp_queue.put(command)
+
+                if self.logger is not None:
+                    self.logger.process_packets(data)
 
             except socket.timeout:
                 # Timeout reached, continue listening

@@ -5,6 +5,8 @@ from rclpy.node import Node
 
 from network_interface.data_flow import DataFlow
 
+from network_interface.network_interface.packet_writer import PacketWriter
+
 
 class NetworkInterface(Node):
 
@@ -54,6 +56,10 @@ class NetworkInterface(Node):
         self.declare_parameter('fault_injector_in_topic', 'netfi_in')
         self.declare_parameter('fault_injector_out_topic', 'netfi_out')
 
+        ### LOGGER
+
+        self.declare_parameter('enable_logger', False)
+
 
 def main(args=None) -> None:
     try:
@@ -62,8 +68,12 @@ def main(args=None) -> None:
 
             mode = node.get_parameter('data_flow.input_mode').get_parameter_value().string_value.lower()
             fault_injector_enabled = node.get_parameter('enable_fault_injector').get_parameter_value().bool_value
+            logger_enabled = node.get_parameter('enable_logger').get_parameter_value().bool_value
             node.get_logger().info(f"Starting in {mode} mode")
 
+            if logger_enabled:
+                node.data_flow.logger = PacketWriter()
+                node.data_flow.logger.packet_writer_thread.start()
             if mode == 'ros':
                 pass
             elif mode == 'udp':
