@@ -4,7 +4,6 @@ from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
 from network_interface.data_flow import DataFlow
-from network_interface.fault_injector import FaultInjector
 
 
 class NetworkInterface(Node):
