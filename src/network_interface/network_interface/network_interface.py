@@ -5,7 +5,7 @@ from rclpy.node import Node
 
 from network_interface.data_flow import DataFlow
 
-from network_interface.network_interface.packet_writer import PacketWriter
+from network_interface.packet_writer import PacketWriter
 
 
 class NetworkInterface(Node):
@@ -72,6 +72,7 @@ def main(args=None) -> None:
             node.get_logger().info(f"Starting in {mode} mode")
 
             if logger_enabled:
+                node.get_logger().info("Packet Writer Logger starting")
                 node.data_flow.logger = PacketWriter()
                 node.data_flow.logger.packet_writer_thread.start()
             if mode == 'ros':

@@ -5,7 +5,7 @@ from queue import Queue
 
 import rclpy
 
-from network_interface.network_interface.packet_writer import PacketWriter
+from network_interface.packet_writer import PacketWriter
 from teleop_msgs.msg import ITPRaw, ITP
 from teleop_msgs_helpers import ITP_helpers
 

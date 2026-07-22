@@ -14,7 +14,7 @@ class PacketWriter:
         self.log_queue = deque()
         self.log_event = threading.Event()
         self.log_lock = threading.Lock()
-        self.packet_writer_thread = threading.Thread(target=self.process_packets, daemon=True)
+        self.packet_writer_thread = threading.Thread(target=self._packet_writer, daemon=True)
 
     def _packet_writer(self):
         """Write logged packets to compressed binary file"""
