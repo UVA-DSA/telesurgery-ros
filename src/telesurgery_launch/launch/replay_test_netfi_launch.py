@@ -13,7 +13,7 @@ def get_share_file(package_name, file_path):
 def generate_launch_description():
     enable_fault_injector_arg = DeclareLaunchArgument(
         'enable_fault_injector',
-        default_value='False',
+        default_value='True',
         description='Enable fault injector'
     )
 
@@ -28,9 +28,9 @@ def generate_launch_description():
                     file_path="launch/console_replay_launch.py"
                 )
             ),
-            launch_arguments={
-                'config': 'ros'
-            }.items(),
+        launch_arguments={
+            'config': 'udp'
+        }.items(),
         ),
 
         IncludeLaunchDescription(
@@ -41,7 +41,7 @@ def generate_launch_description():
                 )
             ),
             launch_arguments={
-                'config': 'ros',
+                'config': 'udp',
                 'enable_fault_injector': enable_fault_injector
             }.items(),
         ),

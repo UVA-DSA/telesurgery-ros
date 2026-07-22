@@ -1,8 +1,18 @@
 /network_interface:
   ros__parameters:
-    input_mode: 'ROS'
-    listen_topic_name: /itp_commands_raw
-    publish_topic_name: /itp_commands
-    udp_ip: 127.0.0.1
-    udp_port: 5001
+    data_flow:
+      input_mode: 'ROS'
+      listen_topic_name: /itp_commands_raw
+      publish_topic_name: /itp_commands
+      udp_ip: 127.0.0.1
+      udp_port: 5001
+/**:
+  ros__parameters:
+    enable_fault_injector: true
+    fault_injector_in_topic: /netfi_in
+    fault_injector_out_topic: /netfi_out
+/netfi_wrapper:
+  ros__parameters:
+    emulator: delay
+    param_file: 'delay_config'
 

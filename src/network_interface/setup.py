@@ -15,6 +15,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'param'), glob('param/*')),
         (os.path.join('share', package_name, 'launch'), glob('launch/*')),
+        (os.path.join('share', package_name, 'netfi_config'), glob('netfi_config/*')),
     ],
     package_data={'': ['py.typed']},
     install_requires=['setuptools'],
@@ -30,7 +31,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'network_interface = network_interface.network_interface:main'
+            'network_interface = network_interface.network_interface:main',
+            'netfi_wrapper = netfi_wrapper.fault_injector:main'
         ],
     },
 )
