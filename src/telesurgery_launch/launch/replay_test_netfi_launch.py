@@ -31,7 +31,7 @@ def generate_launch_description():
                 )
             ),
             launch_arguments={
-                'config': 'udp_netfi'
+                'config': 'udp'
             }.items(),
         ),
 
