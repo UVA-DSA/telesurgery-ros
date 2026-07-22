@@ -17,6 +17,12 @@ def generate_launch_description():
         default_value='ros',
         description='Select config file (without the .yaml)'
     )
+    
+    enable_fault_injector_arg = DeclareLaunchArgument(
+        'enable_fault_injector',
+        default_value='true',
+        description='Enable fault injector for network_interface node'
+    )
 
     config_file_path = PathJoinSubstitution([
         FindPackageShare('network_interface'),
@@ -26,16 +32,23 @@ def generate_launch_description():
 
     return LaunchDescription([
         config_arg,
+        enable_fault_injector_arg,
         Node(
             package='network_interface',
             executable='network_interface',
             name='network_interface',
-            parameters=[config_file_path]
+            parameters=[
+                config_file_path,
+                {'enable_fault_injector': LaunchConfiguration('enable_fault_injector')}
+            ]
         ),
         Node(
             package='network_interface',
             executable='netfi_wrapper',
             name='netfi_wrapper',
-            parameters=[config_file_path]
+            parameters=[
+                config_file_path,
+                {'enable_fault_injector': LaunchConfiguration('enable_fault_injector')}
+            ]
         )
     ])
