@@ -18,7 +18,8 @@ class Net:
         
         self.numbers = 1
         network_conditions_file = os.path.join(os.path.dirname(__file__), "network_conditions.txt")
-        self.P_enabled, self.D_enabled, self.C_enabled, self.model_str, self.trial_num = select_netfault(network_conditions_file, self.config_rootpath, self.numbers)
+        # self.P_enabled, self.D_enabled, self.C_enabled, self.model_str, self.trial_num = select_netfault(network_conditions_file, self.config_rootpath, self.numbers)
+        self.P_enabled, self.D_enabled, self.C_enabled, self.model_str, self.trial_num = False, False, False, "idk", 67
 
         self.filename = "console_data_complete"
 
