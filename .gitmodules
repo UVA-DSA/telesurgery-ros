@@ -4,3 +4,6 @@
 [submodule "ext/NetFI"]
 	path = ext/NetFI
 	url = https://github.com/UVA-DSA/NetFI
+[submodule "ext/pybullet_rendering"]
+	path = ext/pybullet_rendering
+	url = https://github.com/UVA-DSA/pybullet_rendering
