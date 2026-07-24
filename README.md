@@ -80,14 +80,3 @@ If you run into issues, a few good steps are to:
 Use TAB to search launch files.
 
 For example, `ros2 launch telesurgery_launch replay_ros_launch.py enable_fault_injector:=true`
-
-
-
-
-
-
-
-
-
-
-
