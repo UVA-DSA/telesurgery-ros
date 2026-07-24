@@ -16,10 +16,11 @@ Activate the instance
 
 `conda activate ros_env`
 
-Add the robostack channel to the environment
+Add the Robostack channel to the environment
 
 `conda config --env --add channels robostack-kilted`
 `conda install pip` (if somehow pip isn't installed)
+`pip install colcon-common-extensions`
 
 ## pybullet-rendering
 
@@ -37,7 +38,7 @@ Next, update pybind11 within pybullet-rendering:
 Then install. First go to the bullet3 instance provided by telesurgery-qos-analysis:
 
 - `cd ../../../../`
-- `cd telesurgery-qos-analysis/SurRoL_dVTrainer/ext/bullet3` (go to the bullet3 that's given in telesurgery-qos-analysis)
+- `cd telesurgery-qos-analysis/SurRoL_dVTrainer/ext/bullet3` (go to the bullet3 that's provided by telesurgery-qos-analysis)
 - `export BULLET_ROOT_DIR="$PWD"`
 - `pip install pybullet` (don't need to build bullet3 from scratch)
 - `cd ../../../../`
@@ -61,7 +62,24 @@ Additionally:
 - `pip install kivymd==1.1.1`
 - `sudo apt install xclip`
 
+## Building
 
+At project root and with the ros_env conda environment acitve, run:
+
+`colcon build`
+
+If you run into issues, a few good steps are to:
+- `rm -rf build install log`
+- Close and reopen the terminal and activate the conda instance again to clear environment variables
+
+## Launching
+
+`source install/setup.bash`
+`ros2 launch telesurgery_launch <launch_file> <arguments>`
+
+Use TAB to search launch files.
+
+For example, `ros2 launch telesurgery_launch replay_ros_launch.py enable_fault_injector:=true`
 
 
 
