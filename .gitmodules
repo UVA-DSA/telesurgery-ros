@@ -1,6 +1,9 @@
-[submodule "src/surrol_wrapper/surrol_wrapper/telesurgery-qos-analysis"]
-	path = src/surrol_wrapper/telesurgery_qos_analysis
+[submodule "ext/telesurgery-qos-analysis"]
+	path = ext/telesurgery-qos-analysis
 	url = https://github.com/UVA-DSA/telesurgery-qos-analysis
-[submodule "src/network_interface/NetFI"]
-	path = src/network_interface/NetFI
+[submodule "ext/NetFI"]
+	path = ext/NetFI
 	url = https://github.com/UVA-DSA/NetFI
+[submodule "ext/pybullet_rendering"]
+	path = ext/pybullet_rendering
+	url = https://github.com/UVA-DSA/pybullet_rendering
