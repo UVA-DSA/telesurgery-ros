@@ -5,11 +5,11 @@ Telesurgery stack integrated with ROS
 
 You will need:
 
-- Ubuntu 24.04 or later
+- Ubuntu 24.04
 - [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install/linux-install)
 
 ## Conda
-Create a conda instance with [Robostack](https://robostack.github.io/). This installed ROS2 Kilted into a conda instance.
+Create a conda instance with [Robostack](https://robostack.github.io/). This installs ROS2 Kilted into a conda instance.
 `conda create -n ros_env -c conda-forge -c robostack-kilted ros-kilted-desktop`
 
 Activate the instance
@@ -25,17 +25,12 @@ Add the Robostack channel to the environment
 ## pybullet-rendering
 
 pybullet-rendering has not been updated for Python 3.12, but we can compile it from scratch.
+I made a fork of the repository to make it compatible.
 
 First update all git submodules: 
 - `git submodule update --init`
-- `cd ext/pybullet-rendering`
-- `git submodule update --init` (again)
 
-Next, update pybind11 within pybullet-rendering:
-- `cd src/deps/pybind11`
-- `git checkout v2.13.6`
-
-Then install. First go to the bullet3 instance provided by telesurgery-qos-analysis:
+Go to the bullet3 instance provided by telesurgery-qos-analysis, then install
 
 - `cd ../../../../`
 - `cd telesurgery-qos-analysis/SurRoL_dVTrainer/ext/bullet3` (go to the bullet3 that's provided by telesurgery-qos-analysis)
