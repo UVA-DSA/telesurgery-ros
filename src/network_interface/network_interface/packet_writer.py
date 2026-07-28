@@ -5,21 +5,25 @@ import time
 from collections import deque
 
 import lz4.frame
+import rclpy
 
 
 class PacketWriter:
 
-    def __init__(self):
+    def __init__(self, node: rclpy.node.Node):
+        self.node: rclpy.node.Node = node
         self.log_path = os.path.join(os.getcwd(), 'bin_replay')
         self.log_queue = deque()
         self.log_event = threading.Event()
         self.log_lock = threading.Lock()
         self.packet_writer_thread = threading.Thread(target=self._packet_writer, daemon=True)
 
+        self.started = False
+
     def _packet_writer(self):
         """Write logged packets to compressed binary file"""
         with lz4.frame.open(self.log_path, 'wb') as f:
-            while len(self.log_queue) > 0:
+            while self.started:
                 # Wait for new packets or check every second
                 self.log_event.wait(timeout=1.0)
                 self.log_event.clear()
@@ -40,7 +44,11 @@ class PacketWriter:
     def process_packets(self, data: bytes):
         timestamp = time.time_ns()
         entry = (timestamp, len(data), False, data)
-
         with self.log_lock:
             self.log_queue.append(entry)
             self.log_event.set()
+
+        if not self.started:
+            self.node.get_logger().info("Packet Writer Logger starting!")
+            self.started = True
+            self.packet_writer_thread.start()

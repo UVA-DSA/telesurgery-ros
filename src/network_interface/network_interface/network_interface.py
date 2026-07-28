@@ -71,9 +71,8 @@ def main(args=None) -> None:
             node = NetworkInterface()
 
             if node.logger_enabled:
-                node.get_logger().info("Packet Writer Logger starting")
-                node.data_flow.logger = PacketWriter()
-                node.data_flow.logger.packet_writer_thread.start()
+                node.get_logger().info("Packet Writer Logger initializing")
+                node.data_flow.logger = PacketWriter(node)
 
             mode = node.input_mode.lower()
             node.get_logger().info(f"Starting in {mode} mode")
