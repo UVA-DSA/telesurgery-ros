@@ -1,6 +1,7 @@
 import threading
 
 import rclpy
+from rcl_interfaces.msg import ParameterDescriptor
 from rclpy.executors import ExternalShutdownException, MultiThreadedExecutor
 from rclpy.node import Node
 
@@ -10,9 +11,17 @@ from . import multiple_scenes_console_replay
 class Surrol(Node):
     def __init__(self):
         super().__init__('surrol_node')
+        self.init_parameters()
 
     def run_sim(self):
         multiple_scenes_console_replay.main(node=self)
+
+    def init_parameters(self):
+        topic_name_descriptor = ParameterDescriptor(
+            type=rclpy.Parameter.Type.STRING,
+            description='Topic to listen to'
+        )
+        self.declare_parameter('input_topic', '/itp_commands', descriptor=topic_name_descriptor)
 
 def main(args=None) -> None:
     try:
