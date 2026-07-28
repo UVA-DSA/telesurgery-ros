@@ -108,8 +108,9 @@ class DataFlow:
         else:
             self.output_queue.put(command)
 
-        if self.logger is not None:
-            self.logger.process_packets(msg.data)
+        # todo not much reason to log for ros, but reconsider
+        # if self.logger is not None:
+        #     self.logger.process_packets(msg.data)
 
     # Receive from fault injector
     def fault_injector_itp_raw_callback(self, msg: ITP):

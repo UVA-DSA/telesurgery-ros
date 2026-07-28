@@ -6,7 +6,7 @@
       publish_topic_name: /itp_commands
       udp_ip: 127.0.0.1
       udp_port: 5001
-    enable_logger: True
+    enable_logger: False
 /**:
   ros__parameters:
     enable_fault_injector: true
