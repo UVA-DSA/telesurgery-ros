@@ -11,36 +11,44 @@ from teleop_msgs_helpers import ITP_helpers
 class DataFlow:
     def __init__(self, node: rclpy.node.Node):
         self.node: rclpy.Node = node
-        self.fault_injector_enabled = node.get_parameter('enable_fault_injector').get_parameter_value().bool_value
 
-        self.itp_publisher = self.node.create_publisher(ITP, '/itp_commands', 100)
-        self.subscription = self.node.create_subscription(
-            ITPRaw,
-            self.node.get_parameter('data_flow.listen_topic_name').get_parameter_value().string_value,
-            self.itp_raw_callback,
-            100
-        )
-        self.sock = None
+        self.fault_injector_enabled = self.node.get_parameter('enable_fault_injector').get_parameter_value().bool_value
         self.ip = self.node.get_parameter('data_flow.udp_ip').get_parameter_value().string_value
         self.port = self.node.get_parameter('data_flow.udp_port').get_parameter_value().integer_value
-        self.udp_queue: Queue = queue.Queue()
+        self.listen_topic = self.node.get_parameter('data_flow.listen_topic_name').get_parameter_value().string_value
+        self.publish_topic = self.node.get_parameter('data_flow.publish_topic_name').get_parameter_value().string_value
+        self.fault_injector_in_topic = self.node.get_parameter('fault_injector_in_topic').get_parameter_value().string_value
+        self.fault_injector_out_topic = self.node.get_parameter('fault_injector_out_topic').get_parameter_value().string_value
+
+        self.sock = None
+        self.itp_publisher = None
+        self.initial_subscription = None
 
         self.publish_thread = threading.Thread(target=self.publish_itp, daemon=True)
-        self.listen_thread = threading.Thread(target=self.udp_listener, daemon=True)
+        self.udp_listen_thread = threading.Thread(target=self.udp_listener_loop, daemon=True)
+        self.publish_fault_injector_thread = threading.Thread(target=self.publish_to_injector_loop, daemon=True)
 
+        self.output_queue: Queue = queue.Queue()
         self.fault_injector_queue: Queue = queue.Queue()
-        self.fault_injector_publisher = self.node.create_publisher(ITP,
-            node.get_parameter('fault_injector_in_topic').get_parameter_value().string_value, 100)
+
+        self.fault_injector_publisher = None
+        self.fault_injector_subscription = None
+
+    # IO init methods
+
+    def init_output(self):
+        self.itp_publisher = self.node.create_publisher(
+            ITP, self.publish_topic, 100)
+        self.publish_thread.start()
+
+    def init_fault_injector_io(self):
         self.fault_injector_subscription = self.node.create_subscription(
-                ITP,
-                self.node.get_parameter('fault_injector_out_topic').get_parameter_value().string_value,
-                self.fault_injector_itp_raw_callback,
-                100
-            )
-        self.publish_fault_injector_thread = threading.Thread(target=self.publish_to_fault_injector, daemon=True)
+            ITP, self.fault_injector_out_topic, self.fault_injector_itp_raw_callback, 100)
+        self.fault_injector_publisher = self.node.create_publisher(
+            ITP, self.fault_injector_in_topic, 100)
+        self.publish_fault_injector_thread.start()
 
-
-    def init_sock_udp(self):
+    def init_udp_io(self):
         # Create a UDP socket and the data struct ----------------------------------------------------
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.settimeout(2)
@@ -48,23 +56,21 @@ class DataFlow:
         self.node.get_logger().info(f"Initialized a UDP server on IP: {self.ip} and port: {self.port}")
         self.node.get_logger().info("Listening for incoming data:")
 
-    def itp_raw_callback(self, msg: ITPRaw):
-        command = ITP_helpers.raw_to_dict(msg)
+        self.udp_listen_thread.start()
+        self.init_output()
         if self.fault_injector_enabled:
-            self.fault_injector_queue.put(command)
-        else:
-            self.udp_queue.put(command)
+            self.init_fault_injector_io()
 
-    def publish_to_fault_injector(self):
-        while True:
-            command = self.fault_injector_queue.get()
-            msg = ITP_helpers.to_msg(command)
-            self.fault_injector_publisher.publish(msg)
+    def init_ros_io(self):
+        self.initial_subscription = self.node.create_subscription(
+            ITPRaw, self.listen_topic, self.itp_raw_callback, 100)
+        self.init_output()
 
-    def fault_injector_itp_raw_callback(self, msg: ITP):
-        self.udp_queue.put(msg)
+        if self.fault_injector_enabled:
+            self.init_fault_injector_io()
 
-    def udp_listener(self):
+    # loops
+    def udp_listener_loop(self):
         # Taken from Console.py
         while True:
             try:
@@ -73,7 +79,7 @@ class DataFlow:
                 if self.fault_injector_enabled:
                     self.fault_injector_queue.put(command)
                 else:
-                    self.udp_queue.put(command)
+                    self.output_queue.put(command)
 
             except socket.timeout:
                 # Timeout reached, continue listening
@@ -82,9 +88,28 @@ class DataFlow:
                 self.node.get_logger().error(f"Error receiving packet: {e}")
                 # self.get_logger().error(traceback.format_exc())
 
+    def publish_to_injector_loop(self):
+        while True:
+            command = self.fault_injector_queue.get()
+            msg = ITP_helpers.to_msg(command)
+            self.fault_injector_publisher.publish(msg)
+
+    # Receive from replay node via ROS
+    def itp_raw_callback(self, msg: ITPRaw):
+        command = ITP_helpers.raw_to_dict(msg)
+        if self.fault_injector_enabled:
+            self.fault_injector_queue.put(command)
+        else:
+            self.output_queue.put(command)
+
+    # Receive from fault injector
+    def fault_injector_itp_raw_callback(self, msg: ITP):
+        self.output_queue.put(msg)
+
+    # Output
     def publish_itp(self):
         while True:
-            command = self.udp_queue.get()
+            command = self.output_queue.get()
             if isinstance(command, ITP):
                 self.itp_publisher.publish(command)
             elif isinstance(command, dict):
