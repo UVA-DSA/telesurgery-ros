@@ -25,7 +25,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'fault_recovery = recovery.fault_recovery:main'
+            'fault_recovery = recovery.fault_recovery:main',
+            'autonomy_engine = recovery.autonomy_engine:main'
         ],
     },
 )
