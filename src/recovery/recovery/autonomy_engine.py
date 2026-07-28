@@ -18,7 +18,8 @@ class AutonomyEngine(Node):
     def publish_dummy_itp(self):
         if self.state == RecoveryStatus.NORMAL_OPERATION: return
         msg = ITP()
-        msg.grasp0 = self.grasper
+        if self.grasper: msg.grasp0 = 2597
+        else: msg.grasp0 = self.grasper
         self.publisher.publish(msg)
         self.grasper = not self.grasper
 
