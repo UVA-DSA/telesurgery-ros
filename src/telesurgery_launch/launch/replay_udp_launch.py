@@ -46,10 +46,15 @@ def generate_launch_description():
             }.items(),
         ),
 
-        Node(
-            package='surrol_wrapper',
-            executable='surrol_wrapper',
-            name='surrol_wrapper',
-            arguments=[]
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="surrol_wrapper",
+                    file_path="launch/surrol_wrapper_launch.py"
+                )
+            ),
+            launch_arguments={
+                'config': 'old',
+            }.items()
         ),
     ])

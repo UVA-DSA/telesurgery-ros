@@ -13,7 +13,7 @@ def get_share_file(package_name, file_path):
 def generate_launch_description():
     enable_fault_injector_arg = DeclareLaunchArgument(
         'enable_fault_injector',
-        default_value='True',
+        default_value='False',
         description='Enable fault injector'
     )
 
@@ -28,9 +28,9 @@ def generate_launch_description():
                     file_path="launch/console_replay_launch.py"
                 )
             ),
-        launch_arguments={
-            'config': 'udp'
-        }.items(),
+            launch_arguments={
+                'config': 'ros'
+            }.items(),
         ),
 
         IncludeLaunchDescription(
@@ -41,15 +41,41 @@ def generate_launch_description():
                 )
             ),
             launch_arguments={
-                'config': 'udp',
+                'config': 'ros',
                 'enable_fault_injector': enable_fault_injector
             }.items(),
         ),
 
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="surrol_wrapper",
+                    file_path="launch/surrol_wrapper_launch.py"
+                )
+            ),
+            launch_arguments={
+                'config': 'new',
+            }.items()
+        ),
+
         Node(
-            package='surrol_wrapper',
-            executable='surrol_wrapper',
-            name='surrol_wrapper',
+            package='recovery',
+            executable='fault_recovery_state_machine',
+            name='fault_recovery_state_machine',
             arguments=[]
         ),
+
+        Node(
+            package='recovery',
+            executable='autonomy_engine',
+            name='autonomy_engine',
+            arguments=[]
+        ),
+
+        Node(
+            package='command_switch',
+            executable='command_switch',
+            name='command_switch',
+            arguments=[]
+        )
     ])
