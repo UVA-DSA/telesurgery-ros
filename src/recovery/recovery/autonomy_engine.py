@@ -9,11 +9,15 @@ class AutonomyEngine(Node):
     def __init__(self):
         super().__init__('autonomy_engine')
         self.publisher = self.create_publisher(ITP, '/agent/itp_commands', 100)
-        self.timer = self.create_timer(0.1, self.publish_dummy_itp)
+        self.timer = self.create_timer(0.5, self.publish_dummy_itp)
+        self.grasper = True
 
+    # Open and close grasper0 every half second
     def publish_dummy_itp(self):
         msg = ITP()
+        msg.grasp0 = self.grasper
         self.publisher.publish(msg)
+        self.grasper = not self.grasper
 
 def main(args=None):
     try:
