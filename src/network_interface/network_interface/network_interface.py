@@ -15,6 +15,10 @@ class NetworkInterface(Node):
 
         self.init_parameters()
 
+        self.fault_injector_enabled = self.get_parameter('enable_fault_injector').get_parameter_value().bool_value
+        self.logger_enabled = self.get_parameter('enable_logger').get_parameter_value().bool_value
+        self.input_mode = self.get_parameter('data_flow.input_mode').get_parameter_value().string_value
+
         self.data_flow = DataFlow(self)
 
     def init_parameters(self):
@@ -66,27 +70,20 @@ def main(args=None) -> None:
         with rclpy.init(args=args):
             node = NetworkInterface()
 
-            mode = node.get_parameter('data_flow.input_mode').get_parameter_value().string_value.lower()
-            fault_injector_enabled = node.get_parameter('enable_fault_injector').get_parameter_value().bool_value
-            logger_enabled = node.get_parameter('enable_logger').get_parameter_value().bool_value
-            node.get_logger().info(f"Starting in {mode} mode")
-
-            if logger_enabled:
+            if node.logger_enabled:
                 node.get_logger().info("Packet Writer Logger starting")
                 node.data_flow.logger = PacketWriter()
                 node.data_flow.logger.packet_writer_thread.start()
+
+            mode = node.input_mode.lower()
+            node.get_logger().info(f"Starting in {mode} mode")
+
             if mode == 'ros':
-                pass
+                node.data_flow.init_ros_io()
             elif mode == 'udp':
-                node.data_flow.init_sock_udp()
-                node.data_flow.listen_thread.start()
+                node.data_flow.init_udp_io()
             else:
                 raise KeyError(f"Unsupported mode: {mode}")
-
-            if fault_injector_enabled:
-                node.data_flow.publish_fault_injector_thread.start()
-
-            node.data_flow.publish_thread.start()
 
             rclpy.spin(node)
     except (KeyboardInterrupt, ExternalShutdownException):
