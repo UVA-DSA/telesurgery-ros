@@ -27,6 +27,7 @@ setup(
         'console_scripts': [
             'fault_recovery_state_machine = recovery.fault_recovery_state_machine:main',
             'autonomy_engine = recovery.autonomy_engine:main',
+            'network_monitor = recovery.network_monitor:main'
         ],
     },
 )
