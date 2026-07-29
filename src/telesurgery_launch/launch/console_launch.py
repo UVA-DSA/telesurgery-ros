@@ -3,8 +3,9 @@ import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 
 def get_share_file(package_name, file_path):
@@ -27,11 +28,12 @@ def generate_launch_description():
     enable_recovery = LaunchConfiguration('recovery')
 
     surrol_config = PythonExpression([
-        "'new' if '", enable_recovery, "'.lower() in ['true', '1'] else 'old'"
+        "'final' if '", enable_recovery, "'.lower() in ['true', '1'] else 'surgeon'"
     ])
 
     return LaunchDescription([
         enable_fault_injector_arg,
+        enable_recovery_arg,
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 get_share_file(
@@ -53,7 +55,31 @@ def generate_launch_description():
                 )
             ),
             launch_arguments={
-                'config': 'surgeon',
+                'config': surrol_config,
             }.items()
         ),
+
+        Node(
+            package='recovery',
+            executable='fault_recovery_state_machine',
+            name='fault_recovery_state_machine',
+            arguments=[],
+            condition=IfCondition(enable_recovery)
+        ),
+
+        Node(
+            package='recovery',
+            executable='autonomy_engine',
+            name='autonomy_engine',
+            arguments=[],
+            condition=IfCondition(enable_recovery)
+        ),
+
+        Node(
+            package='command_switch',
+            executable='command_switch',
+            name='command_switch',
+            arguments=[],
+            condition=IfCondition(enable_recovery)
+        )
     ])
