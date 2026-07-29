@@ -12,7 +12,7 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     params_arg = DeclareLaunchArgument(
         'config',
-        default_value='new',
+        default_value='final',
         description='PSelect config file (without the .yaml)'
     )
 

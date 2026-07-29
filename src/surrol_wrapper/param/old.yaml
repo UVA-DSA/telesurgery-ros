@@ -1,3 +1,0 @@
-surrol_node:
-  ros__parameters:
-    input_topic: "/itp_commands"

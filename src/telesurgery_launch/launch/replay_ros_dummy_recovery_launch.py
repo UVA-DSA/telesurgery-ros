@@ -54,7 +54,7 @@ def generate_launch_description():
                 )
             ),
             launch_arguments={
-                'config': 'new',
+                'config': 'final',
             }.items()
         ),
 
