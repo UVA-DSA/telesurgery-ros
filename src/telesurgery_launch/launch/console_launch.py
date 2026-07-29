@@ -17,7 +17,18 @@ def generate_launch_description():
         description='Enable fault injector'
     )
 
+    enable_recovery_arg = DeclareLaunchArgument(
+        'recovery',
+        default_value='False',
+        description='Enable recovery nodes'
+    )
+
     enable_fault_injector = LaunchConfiguration('enable_fault_injector')
+    enable_recovery = LaunchConfiguration('recovery')
+
+    surrol_config = PythonExpression([
+        "'new' if '", enable_recovery, "'.lower() in ['true', '1'] else 'old'"
+    ])
 
     return LaunchDescription([
         enable_fault_injector_arg,
@@ -34,10 +45,15 @@ def generate_launch_description():
             }.items(),
         ),
 
-        Node(
-            package='surrol_wrapper',
-            executable='surrol_wrapper',
-            name='surrol_wrapper',
-            arguments=[]
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="surrol_wrapper",
+                    file_path="launch/surrol_wrapper_launch.py"
+                )
+            ),
+            launch_arguments={
+                'config': 'surgeon',
+            }.items()
         ),
     ])
