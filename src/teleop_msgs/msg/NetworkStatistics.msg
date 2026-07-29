@@ -1,0 +1,4 @@
+float64 interarrival_median
+float64 interarrival_sd
+int32 last_sequence
+# Time last_reception
