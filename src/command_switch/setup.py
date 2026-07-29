@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'recovery'
+package_name = 'command_switch'
 
 setup(
     name=package_name,
@@ -25,8 +25,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'fault_recovery_state_machine = recovery.fault_recovery_state_machine:main',
-            'autonomy_engine = recovery.autonomy_engine:main',
+            'command_switch = command_switch.command_switch:main'
         ],
     },
 )
