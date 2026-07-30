@@ -57,6 +57,10 @@ class NetworkInterface(Node):
         self.declare_parameter('fault_injector_in_topic', 'netfi_in')
         self.declare_parameter('fault_injector_out_topic', 'netfi_out')
 
+    def destroy_node(self) -> None:
+        self.data_flow.stop()
+        super().destroy_node()
+
 
 def main(args=None) -> None:
     try:

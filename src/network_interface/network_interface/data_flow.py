@@ -72,7 +72,7 @@ class DataFlow:
     # loops
     def udp_listener_loop(self):
         # Taken from Console.py
-        while True:
+        while rclpy.ok():
             try:
                 data, addr = self.sock.recvfrom(1024)  # Buffer size of 1024 bytes
                 command = ITP_helpers.bytes_to_dict(data)
@@ -89,7 +89,7 @@ class DataFlow:
                 # self.get_logger().error(traceback.format_exc())
 
     def publish_to_injector_loop(self):
-        while True:
+        while rclpy.ok():
             command = self.fault_injector_queue.get()
             msg = ITP_helpers.to_msg(command)
             self.fault_injector_publisher.publish(msg)
@@ -117,3 +117,10 @@ class DataFlow:
                 self.itp_publisher.publish(msg)
             else:
                 self.node.get_logger().warning("Received unknown command type when publishing ITP commands")
+
+    def stop(self):
+        if self.publish_thread.is_alive(): self.publish_thread.join(timeout=1.0)
+        if self.udp_listen_thread.is_alive(): self.udp_listen_thread.join(timeout=1.0)
+        if self.publish_fault_injector_thread.is_alive(): self.publish_fault_injector_thread.join(timeout=1.0)
+        if self.sock:
+            self.sock.close()
