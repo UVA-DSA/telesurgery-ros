@@ -10,7 +10,7 @@ class CommandSwitch(Node):
         super().__init__('command_switch')
         self.publisher_ = self.create_publisher(ITP, '/final/itp_commands', 100)
         self.agent_listener = self.create_subscription(ITP, '/agent/itp_commands', self.agent_callback, 100)
-        self.surgeon_listener = self.create_subscription(ITP, '/itp_commands', self.surgeon_callback, 100)
+        self.surgeon_listener = self.create_subscription(ITP, '/surgeon/itp_commands', self.surgeon_callback, 100)
         self.state_listener = self.create_subscription(RecoveryStatus, '/recovery_type', self.recovery_callback, 10)
 
         self.state = RecoveryStatus.NORMAL_OPERATION
