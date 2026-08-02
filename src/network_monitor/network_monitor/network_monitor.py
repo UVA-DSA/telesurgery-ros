@@ -3,7 +3,6 @@ import random
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from std_msgs.msg import Empty
 
 from teleop_msgs.srv import NetworkStatistics
 
