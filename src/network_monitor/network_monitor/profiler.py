@@ -23,7 +23,6 @@ class Profiler:
         out = Int32()
         t = self.sequences.get(msg.sequence, None)
         if t is not None:
-            self.node.get_logger().info(f"begin: {t} end: {time.time_ns()}")
             out.data = (time.time_ns() - t) // 1000000
             self.latency_pub.publish(out)
             del self.sequences[msg.sequence]
