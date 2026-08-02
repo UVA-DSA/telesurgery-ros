@@ -15,6 +15,7 @@ class NetworkInterface(Node):
 
         self.fault_injector_enabled = self.get_parameter('enable_fault_injector').get_parameter_value().bool_value
         self.input_mode = self.get_parameter('data_flow.input_mode').get_parameter_value().string_value
+        self.profiler_enabled = self.get_parameter('profiler').get_parameter_value().bool_value
 
         self.data_flow = DataFlow(self)
 
@@ -57,6 +58,10 @@ class NetworkInterface(Node):
         self.declare_parameter('fault_injector_in_topic', 'netfi_in')
         self.declare_parameter('fault_injector_out_topic', 'netfi_out')
 
+        ### PROFILER
+
+        self.declare_parameter('profiler', False)
+
 
 def main(args=None) -> None:
     try:
@@ -65,6 +70,9 @@ def main(args=None) -> None:
 
             mode = node.input_mode.lower()
             node.get_logger().info(f"Starting in {mode} mode")
+
+            if node.profiler_enabled:
+                node.data_flow.init_profiler_out()
 
             if mode == 'ros':
                 node.data_flow.init_ros_io()

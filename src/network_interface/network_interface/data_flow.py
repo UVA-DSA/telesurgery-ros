@@ -4,6 +4,8 @@ import threading
 from queue import Queue
 
 import rclpy
+from std_msgs.msg import Int32
+
 from teleop_msgs.msg import ITPRaw, ITP
 from teleop_msgs_helpers import ITP_helpers
 
@@ -27,12 +29,15 @@ class DataFlow:
         self.publish_thread = threading.Thread(target=self.publish_itp, daemon=True)
         self.udp_listen_thread = threading.Thread(target=self.udp_listener_loop, daemon=True)
         self.publish_fault_injector_thread = threading.Thread(target=self.publish_to_injector_loop, daemon=True)
+        self.profiler_thread = threading.Thread(target=self.profiler_loop, daemon=True)
 
         self.output_queue: Queue = queue.Queue()
         self.fault_injector_queue: Queue = queue.Queue()
+        self.profiler_queue: Queue = queue.Queue()
 
         self.fault_injector_publisher = None
         self.fault_injector_subscription = None
+        self.profiler_publisher = None
 
     # IO init methods
 
@@ -40,6 +45,10 @@ class DataFlow:
         self.itp_publisher = self.node.create_publisher(
             ITP, self.publish_topic, 100)
         self.publish_thread.start()
+
+    def init_profiler_out(self):
+        self.profiler_publisher = self.node.create_publisher(Int32, '/profiler/first_received', 10)
+        self.profiler_thread.start()
 
     def init_fault_injector_io(self):
         self.fault_injector_subscription = self.node.create_subscription(
@@ -81,6 +90,9 @@ class DataFlow:
                 else:
                     self.output_queue.put(command)
 
+                if self.profiler_thread.is_alive():
+                    self.profiler_queue.put(command)
+
             except socket.timeout:
                 # Timeout reached, continue listening
                 continue
@@ -94,6 +106,13 @@ class DataFlow:
             msg = ITP_helpers.to_msg(command)
             self.fault_injector_publisher.publish(msg)
 
+    def profiler_loop(self):
+        while rclpy.ok():
+            command = self.profiler_queue.get()
+            msg = Int32()
+            msg.data = command['sequence']
+            self.profiler_publisher.publish(msg)
+
     # Receive from replay node via ROS
     def itp_raw_callback(self, msg: ITPRaw):
         command = ITP_helpers.raw_to_dict(msg)
@@ -101,6 +120,9 @@ class DataFlow:
             self.fault_injector_queue.put(command)
         else:
             self.output_queue.put(command)
+
+        if self.profiler_thread.is_alive():
+            self.profiler_queue.put(command)
 
     # Receive from fault injector
     def fault_injector_itp_raw_callback(self, msg: ITP):

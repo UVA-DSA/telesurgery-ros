@@ -21,7 +21,7 @@ class Surrol(Node):
             type=rclpy.Parameter.Type.STRING,
             description='Topic to listen to'
         )
-        self.declare_parameter('input_topic', '/itp_commands', descriptor=topic_name_descriptor)
+        self.declare_parameter('simulator_input_topic', '/final/itp_commands', descriptor=topic_name_descriptor)
 
 def main(args=None) -> None:
     try:

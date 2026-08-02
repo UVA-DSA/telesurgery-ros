@@ -24,16 +24,20 @@ def generate_launch_description():
         description='Enable recovery nodes'
     )
 
+    enable_profiler_arg = DeclareLaunchArgument(
+        'profiler',
+        default_value='False',
+        description='Enable profiler'
+    )
+
     enable_fault_injector = LaunchConfiguration('enable_fault_injector')
     enable_recovery = LaunchConfiguration('recovery')
-
-    surrol_config = PythonExpression([
-        "'final' if '", enable_recovery, "'.lower() in ['true', '1'] else 'surgeon'"
-    ])
+    enable_profiler = LaunchConfiguration('profiler')
 
     return LaunchDescription([
         enable_fault_injector_arg,
         enable_recovery_arg,
+        enable_profiler_arg,
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 get_share_file(
@@ -43,7 +47,8 @@ def generate_launch_description():
             ),
             launch_arguments={
                 'config': 'udp',
-                'enable_fault_injector': enable_fault_injector
+                'enable_fault_injector': enable_fault_injector,
+                'profiler': enable_profiler
             }.items(),
         ),
 
@@ -55,7 +60,7 @@ def generate_launch_description():
                 )
             ),
             launch_arguments={
-                'config': surrol_config,
+                'config': 'final',
             }.items()
         ),
 
@@ -80,6 +85,17 @@ def generate_launch_description():
             executable='command_switch',
             name='command_switch',
             arguments=[],
-            condition=IfCondition(enable_recovery)
-        )
+        ),
+
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="network_monitor",
+                    file_path="launch/network_monitor_launch.py"
+                )
+            ),
+            launch_arguments={
+                'profiler': enable_profiler
+            }.items(),
+        ),
     ])

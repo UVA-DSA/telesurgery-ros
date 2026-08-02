@@ -24,6 +24,12 @@ def generate_launch_description():
         description='Enable fault injector for network_interface node'
     )
 
+    profiler_arg = DeclareLaunchArgument(
+        'profiler',
+        default_value='false',
+        description='Enable profiler'
+    )
+
     config_file_path = PathJoinSubstitution([
         FindPackageShare('network_interface'),
         'param',
@@ -33,13 +39,15 @@ def generate_launch_description():
     return LaunchDescription([
         config_arg,
         enable_fault_injector_arg,
+        profiler_arg,
         Node(
             package='network_interface',
             executable='network_interface',
             name='network_interface',
             parameters=[
                 config_file_path,
-                {'enable_fault_injector': LaunchConfiguration('enable_fault_injector')}
+                {'enable_fault_injector': LaunchConfiguration('enable_fault_injector')},
+                {'profiler': LaunchConfiguration('profiler')}
             ]
         ),
         Node(
@@ -48,7 +56,7 @@ def generate_launch_description():
             name='netfi_wrapper',
             parameters=[
                 config_file_path,
-                {'enable_fault_injector': LaunchConfiguration('enable_fault_injector')}
+                {'enable_fault_injector': LaunchConfiguration('enable_fault_injector')},
             ]
         )
     ])

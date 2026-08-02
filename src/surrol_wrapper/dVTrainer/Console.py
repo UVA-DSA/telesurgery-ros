@@ -67,7 +67,7 @@ class Console:
         print("Listening for incoming data: \n")
 
     def init_itp_listener(self):
-        topic_name = self.ros_node.get_parameter('input_topic').get_parameter_value().string_value
+        topic_name = self.ros_node.get_parameter('simulator_input_topic').get_parameter_value().string_value
         self.subscription = self.ros_node.create_subscription(
             ITP,
             topic_name,
