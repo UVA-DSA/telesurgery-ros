@@ -14,7 +14,7 @@ class NetworkMonitor(Node):
 
         self.create_service(NetworkStatistics, "/network_statistics", self.statistics_callback)
 
-
+        self.profiler_enabled = self.get_parameter('profiler').get_parameter_value().bool_value
 
 
     def statistics_callback(self, request, response: NetworkStatistics):
