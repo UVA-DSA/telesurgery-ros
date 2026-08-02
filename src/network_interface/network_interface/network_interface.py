@@ -57,6 +57,10 @@ class NetworkInterface(Node):
         self.declare_parameter('fault_injector_in_topic', 'netfi_in')
         self.declare_parameter('fault_injector_out_topic', 'netfi_out')
 
+        ### PROFILER
+
+        self.declare_parameter('profiler', False)
+
 
 def main(args=None) -> None:
     try:

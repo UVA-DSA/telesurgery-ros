@@ -10,7 +10,12 @@ from teleop_msgs.srv import NetworkStatistics
 class NetworkMonitor(Node):
     def __init__(self):
         super().__init__('network_monitor')
+        self.declare_parameter('profiler', False)
+
         self.create_service(NetworkStatistics, "/network_statistics", self.statistics_callback)
+
+
+
 
     def statistics_callback(self, request, response: NetworkStatistics):
         rand_float = random.uniform(0, 1)
