@@ -93,5 +93,12 @@ def generate_launch_description():
             name='command_switch',
             arguments=[],
             condition=IfCondition(enable_recovery)
+        ),
+
+        Node(
+            package='network_monitor',
+            executable='network_monitor',
+            name='network_monitor',
+            arguments=[],
         )
     ])
