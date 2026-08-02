@@ -108,7 +108,7 @@ class DataFlow:
 
     # Output
     def publish_itp(self):
-        while True:
+        while rclpy.ok():
             command = self.output_queue.get()
             if isinstance(command, ITP):
                 self.itp_publisher.publish(command)

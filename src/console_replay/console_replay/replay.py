@@ -14,9 +14,6 @@ class Replay:
         self.filepath = filepath
         self._stop_event = threading.Event()
 
-    def stop(self):
-        self._stop_event.set()
-
     def replay_udp(self, dest_ip, dest_port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(1.0)  # ← prevents blocking forever on send
@@ -27,7 +24,7 @@ class Replay:
             with lz4.frame.open(self.filepath, 'rb') as f:
                 previous_time = 0
                 system_time = time.time()
-                while not self._stop_event.is_set():  # ← check stop flag each iteration
+                while not self._stop_event.is_set() and rclpy.ok():  # ← check stop flag each iteration
                     header = f.read(11)
                     if not header or len(header) < 11:
                         break
@@ -66,7 +63,7 @@ class Replay:
         with lz4.frame.open(self.filepath, 'rb') as f:
             previous_time = 0
             system_time = time.time()
-            while not self._stop_event.is_set():  # ← check stop flag each iteration
+            while not self._stop_event.is_set() and rclpy.ok():  # ← check stop flag each iteration
                 header = f.read(11)
                 if not header or len(header) < 11:
                     break
