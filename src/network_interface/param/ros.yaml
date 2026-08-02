@@ -3,7 +3,7 @@
     data_flow:
       input_mode: 'ROS'
       listen_topic_name: /itp_commands_raw
-      publish_topic_name: /itp_commands
+      publish_topic_name: /surgeon/itp_commands
       udp_ip: 127.0.0.1
       udp_port: 5001
     enable_logger: False
