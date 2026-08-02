@@ -94,6 +94,7 @@ class ConsoleReplay(Node):
         self.thread = threading.Thread(
             target=func, args=args, daemon=True
         )
+        self.thread.start()
 
 def main(args=None) -> None:
     try:
