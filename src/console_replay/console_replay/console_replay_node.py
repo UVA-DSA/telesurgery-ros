@@ -1,4 +1,5 @@
 import os
+import threading
 
 import rclpy
 from rclpy.executors import ExternalShutdownException
@@ -36,6 +37,7 @@ class ConsoleReplay(Node):
             self.start,
             10
         )
+        self.thread: threading.Thread = None
 
         self.itp_raw_publisher = self.create_publisher(ITPRaw,
                                                        self.get_parameter('ros_topic_name').get_parameter_value().string_value,
@@ -80,13 +82,19 @@ class ConsoleReplay(Node):
         mode = self.get_parameter('output_mode').get_parameter_value().string_value
         if mode.lower() == 'udp':
             self.get_logger().info("Starting replay on UDP")
-            self.replay_obj.replay_udp(dest_ip=self.get_parameter('udp_ip').get_parameter_value().string_value,
-                                       dest_port=self.get_parameter('udp_port').get_parameter_value().integer_value)
+            args = (self.get_parameter('udp_ip').get_parameter_value().string_value, self.get_parameter('udp_port').get_parameter_value().integer_value)
+            func = self.replay_obj.replay_udp
         elif mode.lower() == 'ros' or mode.lower() == 'ros2':
             self.get_logger().info("Starting replay on ROS")
-            self.replay_obj.replay_ros(self.itp_raw_publisher)
+            func = self.replay_obj.replay_ros
+            args = (self.itp_raw_publisher,)
         else:
             raise KeyError(f"Unsupported mode: {mode}")
+
+        self.thread = threading.Thread(
+            target=func, args=args, daemon=True
+        )
+        self.thread.start()
 
 def main(args=None) -> None:
     try:
