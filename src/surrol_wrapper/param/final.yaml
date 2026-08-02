@@ -1,3 +1,3 @@
-surrol_node:
+/**:
   ros__parameters:
-    input_topic: "/final/itp_commands"
+    simulator_input_topic: "/final/itp_commands"
