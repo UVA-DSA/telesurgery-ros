@@ -1,3 +1,0 @@
-/**:
-  ros__parameters:
-    simulator_input_topic: "/surgeon/itp_commands"

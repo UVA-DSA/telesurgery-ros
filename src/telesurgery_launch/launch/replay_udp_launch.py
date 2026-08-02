@@ -34,10 +34,6 @@ def generate_launch_description():
     enable_recovery = LaunchConfiguration('recovery')
     enable_profiler = LaunchConfiguration('profiler')
 
-    surrol_config = PythonExpression([
-        "'final' if '", enable_recovery, "'.lower() in ['true', '1'] else 'surgeon'"
-    ])
-
     return LaunchDescription([
         enable_fault_injector_arg,
         enable_recovery_arg,
@@ -76,7 +72,7 @@ def generate_launch_description():
                 )
             ),
             launch_arguments={
-                'config': surrol_config,
+                'config': 'final',
             }.items()
         ),
 
@@ -101,7 +97,6 @@ def generate_launch_description():
             executable='command_switch',
             name='command_switch',
             arguments=[],
-            condition=IfCondition(enable_recovery)
         ),
 
         IncludeLaunchDescription(
