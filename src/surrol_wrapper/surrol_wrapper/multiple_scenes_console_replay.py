@@ -1,6 +1,7 @@
 import os
 
 import rclpy
+from sensor_msgs.msg import Image
 
 from teleop_msgs.msg import ArmKinematics
 from teleop_msgs_helpers import ArmKinematics_helpers
@@ -2235,6 +2236,9 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
                 #print(width, height, rgb_pixels.shape, depth_pixels.shape, seg_pixels.shape)
                 self.time = task.time
 
+                rgb_array = np.array(rgb_pixels, dtype=np.uint8).tobytes()
+                publish_png(rgb_array, width, height)
+
                 # --- Get PSM poses here ---
                 psm1_pose = self.env.psm1.get_current_position()
                 pos1 = psm1_pose[:3, 3]
@@ -2467,10 +2471,23 @@ def main(node: rclpy.node.Node =None): # ecm steoro size 1024x768
     global app, ros_node, kinematicvideopublisher, videopublisher
     ros_node = node
     kinematicvideopublisher = node.create_publisher(ArmKinematics, '/kinematicvideo', 100)
+    videopublisher = node.create_publisher(Image, 'video', 100)
     app_cfg = ApplicationConfig(window_width=1850, window_height=1020)
     app = Application(app_cfg)
     open_scene(0)
     app.run()
 
+def publish_png(pixels, width, height):
+    msg = Image()
+    msg.header.stamp = ros_node.get_clock().now().to_msg()
+    msg.header.frame_id = "idk"
+    msg.height = height
+    msg.width = width
+    msg.encoding = 'rgb8'
+    msg.is_bigendian = False
+    msg.step = width * 3
+    msg.data = pixels
+
+    videopublisher.publish(msg)
 if __name__ == '__main__':
     main()
