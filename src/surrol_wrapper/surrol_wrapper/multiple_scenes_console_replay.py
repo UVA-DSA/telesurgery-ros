@@ -1,4 +1,10 @@
 import os
+
+import rclpy
+
+from teleop_msgs.msg import ArmKinematics
+from teleop_msgs_helpers import ArmKinematics_helpers
+
 os.environ["KIVY_NO_ARGS"] = "1"
 from kivy.lang import Builder
 import numpy as np
@@ -2241,6 +2247,9 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
                 rot2 = R.from_matrix(psm2_pose[:3, :3]).as_euler('xyz')
                 #print(f"psm2 rot: {rot2[-1]}")
 
+                kinematic_msg = ArmKinematics_helpers.to_msg(psm1_pose, psm2_pose)
+                kinematicvideopublisher.publish(kinematic_msg)
+
                 if self.video_recording == False:
                     self.video_recording = True
                     self.obs.start_recording()
@@ -2454,9 +2463,10 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
         self.kivy_ui.stop()
         self.app.win.removeDisplayRegion(self.ui_display_region)
 
-def main(node=None): # ecm steoro size 1024x768
-    global app, ros_node
+def main(node: rclpy.node.Node =None): # ecm steoro size 1024x768
+    global app, ros_node, kinematicvideopublisher, videopublisher
     ros_node = node
+    kinematicvideopublisher = node.create_publisher(ArmKinematics, '/kinematicvideo', 100)
     app_cfg = ApplicationConfig(window_width=1850, window_height=1020)
     app = Application(app_cfg)
     open_scene(0)
