@@ -95,6 +95,8 @@ def main(args=None) -> None:
             rclpy.spin(node)
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
+    finally:
+        node.data_flow.stop()
 
 
 if __name__ == '__main__':

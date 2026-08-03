@@ -154,5 +154,7 @@ class DataFlow:
         if self.publish_thread.is_alive(): self.publish_thread.join(timeout=1.0)
         if self.udp_listen_thread.is_alive(): self.udp_listen_thread.join(timeout=1.0)
         if self.publish_fault_injector_thread.is_alive(): self.publish_fault_injector_thread.join(timeout=1.0)
+        if self.logger:
+            self.logger.stop()
         if self.sock:
             self.sock.close()
