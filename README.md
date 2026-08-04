@@ -72,6 +72,31 @@ If you run into issues, a few good steps are to:
 `source install/setup.bash`
 `ros2 launch telesurgery_launch <launch_file> <arguments>`
 
-Use TAB to search launch files.
-
 For example, `ros2 launch telesurgery_launch replay_ros_launch.py enable_fault_injector:=true`
+
+Use TAB to search launch files. Available ones:
+`console_launch.py`: For use with the physical console.
+`replay_ros_launch.py`: Replaying a recording over ROS
+`replay_udp_launch.py`: Replaying a recording over UDP
+
+Use `ros2 launch telesurgery_launch <launch_file> --show-args` to list arguments.
+
+## Diagnostics + Visualization
+
+At any point in another terminal while the stack is running, these commands might be helpful:
+- `ros2 topic list`
+- `ros2 node list`
+- `ros2 param list`
+- `ros2 param get <node-name> <param-name>`
+
+If `ros2` isn't found, you should activate the ROS2 conda instance or source another ROS installation.
+
+I would recommend using [Foxglove](https://foxglove.dev/) for visualizations.
+
+In order to use this, in another terminal in the project directory, run:
+- `colcon build` (can skip if done recently in another terminal)
+- `source install/setup.bash`
+- `ros2 launch foxglove_bridge foxglove_bridge_launch.xml`
+
+[Here's an example of me making sure the /video topic was displaying correct video information, alongside other topics](https://www.youtube.com/watch?v=zLNotvQsB9c)
+
