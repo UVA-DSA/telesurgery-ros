@@ -94,6 +94,13 @@ def generate_launch_description():
         ),
 
         Node(
+            package='recovery',
+            executable='activity_recognition',
+            name='activity_recognition',
+            condition=IfCondition(enable_recovery)
+        ),
+
+        Node(
             package='command_switch',
             executable='command_switch',
             name='command_switch',
