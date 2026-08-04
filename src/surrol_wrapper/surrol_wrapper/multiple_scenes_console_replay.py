@@ -2487,7 +2487,7 @@ def main(node: rclpy.node.Node =None, framerate = 30): # ecm steoro size 1024x76
     global app, ros_node, kinematicvideopublisher, videopublisher, output_framerate
     output_framerate = framerate
     ros_node = node
-    kinematicvideopublisher = node.create_publisher(ArmKinematics, '/kinematicvideo', 100)
+    kinematicvideopublisher = node.create_publisher(ArmKinematics, '/kinematics', 100)
     videopublisher = node.create_publisher(Image, '/video', 100)
     app_cfg = ApplicationConfig(window_width=1850, window_height=1020)
     app = Application(app_cfg)
