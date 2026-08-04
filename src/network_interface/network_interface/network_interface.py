@@ -5,6 +5,8 @@ from rclpy.node import Node
 
 from network_interface.data_flow import DataFlow
 
+from network_interface.packet_writer import PacketWriter
+
 
 class NetworkInterface(Node):
 
@@ -14,6 +16,7 @@ class NetworkInterface(Node):
         self.init_parameters()
 
         self.fault_injector_enabled = self.get_parameter('enable_fault_injector').get_parameter_value().bool_value
+        self.logger_enabled = self.get_parameter('logger').get_parameter_value().bool_value
         self.input_mode = self.get_parameter('data_flow.input_mode').get_parameter_value().string_value
         self.profiler_enabled = self.get_parameter('profiler').get_parameter_value().bool_value
 
@@ -58,6 +61,10 @@ class NetworkInterface(Node):
         self.declare_parameter('fault_injector_in_topic', 'netfi_in')
         self.declare_parameter('fault_injector_out_topic', 'netfi_out')
 
+        ### LOGGER
+
+        self.declare_parameter('logger', False)
+
         ### PROFILER
 
         self.declare_parameter('profiler', False)
@@ -67,6 +74,10 @@ def main(args=None) -> None:
     try:
         with rclpy.init(args=args):
             node = NetworkInterface()
+
+            if node.logger_enabled:
+                node.get_logger().info("Packet Writer Logger initializing")
+                node.data_flow.logger = PacketWriter(node)
 
             mode = node.input_mode.lower()
             node.get_logger().info(f"Starting in {mode} mode")
@@ -84,6 +95,8 @@ def main(args=None) -> None:
             rclpy.spin(node)
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
+    finally:
+        node.data_flow.stop()
 
 
 if __name__ == '__main__':

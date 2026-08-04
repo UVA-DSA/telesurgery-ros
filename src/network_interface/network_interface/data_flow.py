@@ -4,6 +4,8 @@ import threading
 from queue import Queue
 
 import rclpy
+
+from network_interface.packet_writer import PacketWriter
 from std_msgs.msg import Int32
 
 from teleop_msgs.msg import ITPRaw, ITP
@@ -13,6 +15,7 @@ from teleop_msgs_helpers import ITP_helpers
 class DataFlow:
     def __init__(self, node: rclpy.node.Node):
         self.node: rclpy.Node = node
+        self.logger: PacketWriter = None
 
         self.fault_injector_enabled = self.node.get_parameter('enable_fault_injector').get_parameter_value().bool_value
         self.ip = self.node.get_parameter('data_flow.udp_ip').get_parameter_value().string_value
@@ -93,6 +96,9 @@ class DataFlow:
                 if self.profiler_thread.is_alive():
                     self.profiler_queue.put(command)
 
+                if self.logger is not None:
+                    self.logger.process_packets(data)
+
             except socket.timeout:
                 # Timeout reached, continue listening
                 continue
@@ -121,6 +127,10 @@ class DataFlow:
         else:
             self.output_queue.put(command)
 
+        # todo not much reason to log for ros, but reconsider
+        # if self.logger is not None:
+        #     self.logger.process_packets(msg.data)
+
         if self.profiler_thread.is_alive():
             self.profiler_queue.put(command)
 
@@ -144,5 +154,7 @@ class DataFlow:
         if self.publish_thread.is_alive(): self.publish_thread.join(timeout=1.0)
         if self.udp_listen_thread.is_alive(): self.udp_listen_thread.join(timeout=1.0)
         if self.publish_fault_injector_thread.is_alive(): self.publish_fault_injector_thread.join(timeout=1.0)
+        if self.logger:
+            self.logger.stop()
         if self.sock:
             self.sock.close()

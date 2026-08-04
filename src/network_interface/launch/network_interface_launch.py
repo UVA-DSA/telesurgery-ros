@@ -36,10 +36,17 @@ def generate_launch_description():
         [LaunchConfiguration('config'), '.yaml']
     ])
 
+    logger_arg = DeclareLaunchArgument(
+        'logger',
+        default_value='false',
+        description='Enable logger'
+    )
+
     return LaunchDescription([
         config_arg,
         enable_fault_injector_arg,
         profiler_arg,
+        logger_arg,
         Node(
             package='network_interface',
             executable='network_interface',
@@ -47,7 +54,8 @@ def generate_launch_description():
             parameters=[
                 config_file_path,
                 {'enable_fault_injector': LaunchConfiguration('enable_fault_injector')},
-                {'profiler': LaunchConfiguration('profiler')}
+                {'profiler': LaunchConfiguration('profiler')},
+                {'logger': LaunchConfiguration('logger')}
             ]
         ),
         Node(
