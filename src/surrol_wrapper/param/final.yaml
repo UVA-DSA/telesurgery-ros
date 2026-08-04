@@ -1,3 +1,4 @@
 /**:
   ros__parameters:
     simulator_input_topic: "/final/itp_commands"
+    output_video_every: 6 # frames

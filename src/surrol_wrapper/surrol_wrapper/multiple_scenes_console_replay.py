@@ -2216,7 +2216,6 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
         #self.obs.start_recording()
 
         self.frame_counter = 0
-        self.record_every_x_frames = 30
 
     def _step_simulation_task(self, task):
         """Step simulation
@@ -2232,7 +2231,7 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
 
                 # Call trigger update scene (if necessary) and draw methods
                 self.frame_counter += 1
-                if self.record_every_x_frames > 0 and self.frame_counter >= self.record_every_x_frames:
+                if output_framerate > 0 and self.frame_counter >= output_framerate:
                     (width, height, rgb_pixels, depth_pixels, seg_pixels) = p.getCameraImage(
                         # width=256, height=256,
                         width=self.app.win.getXSize(), height=self.app.win.getYSize(),
@@ -2249,7 +2248,7 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
                 #print(width, height, rgb_pixels.shape, depth_pixels.shape, seg_pixels.shape)
                 self.time = task.time
 
-                if self.record_every_x_frames > 0 and self.frame_counter >= self.record_every_x_frames:
+                if output_framerate > 0 and self.frame_counter >= output_framerate:
                     rgb_array = np.array(rgb_pixels, dtype=np.uint8).reshape((height, width, 4)).astype(np.uint8)
                     rgb_array = rgb_array[:, :, :3][:, :, ::-1]
                     rgb_array = np.ascontiguousarray(rgb_array).tobytes()
@@ -2484,11 +2483,12 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
         self.kivy_ui.stop()
         self.app.win.removeDisplayRegion(self.ui_display_region)
 
-def main(node: rclpy.node.Node =None): # ecm steoro size 1024x768
-    global app, ros_node, kinematicvideopublisher, videopublisher
+def main(node: rclpy.node.Node =None, framerate = 30): # ecm steoro size 1024x768
+    global app, ros_node, kinematicvideopublisher, videopublisher, output_framerate
+    output_framerate = framerate
     ros_node = node
     kinematicvideopublisher = node.create_publisher(ArmKinematics, '/kinematicvideo', 100)
-    videopublisher = node.create_publisher(Image, 'video', 100)
+    videopublisher = node.create_publisher(Image, '/video', 100)
     app_cfg = ApplicationConfig(window_width=1850, window_height=1020)
     app = Application(app_cfg)
     open_scene(0)
