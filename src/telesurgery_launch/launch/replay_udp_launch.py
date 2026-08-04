@@ -60,7 +60,8 @@ def generate_launch_description():
             launch_arguments={
                 'config': 'udp',
                 'enable_fault_injector': enable_fault_injector,
-                'profiler': enable_profiler
+                'profiler': enable_profiler,
+                'logger': 'false'
             }.items(),
         ),
 

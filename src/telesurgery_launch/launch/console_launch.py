@@ -30,9 +30,16 @@ def generate_launch_description():
         description='Enable profiler'
     )
 
+    enable_logger_arg = DeclareLaunchArgument(
+        'logger',
+        default_value='False',
+        description='Enable logger'
+    )
+
     enable_fault_injector = LaunchConfiguration('enable_fault_injector')
     enable_recovery = LaunchConfiguration('recovery')
     enable_profiler = LaunchConfiguration('profiler')
+    enable_logger = LaunchConfiguration('logger')
 
     return LaunchDescription([
         enable_fault_injector_arg,
@@ -48,7 +55,8 @@ def generate_launch_description():
             launch_arguments={
                 'config': 'udp',
                 'enable_fault_injector': enable_fault_injector,
-                'profiler': enable_profiler
+                'profiler': enable_profiler,
+                'logger': enable_logger
             }.items(),
         ),
 

@@ -16,7 +16,7 @@ class NetworkInterface(Node):
         self.init_parameters()
 
         self.fault_injector_enabled = self.get_parameter('enable_fault_injector').get_parameter_value().bool_value
-        self.logger_enabled = self.get_parameter('enable_logger').get_parameter_value().bool_value
+        self.logger_enabled = self.get_parameter('logger').get_parameter_value().bool_value
         self.input_mode = self.get_parameter('data_flow.input_mode').get_parameter_value().string_value
         self.profiler_enabled = self.get_parameter('profiler').get_parameter_value().bool_value
 
@@ -63,7 +63,7 @@ class NetworkInterface(Node):
 
         ### LOGGER
 
-        self.declare_parameter('enable_logger', False)
+        self.declare_parameter('logger', False)
 
         ### PROFILER
 
