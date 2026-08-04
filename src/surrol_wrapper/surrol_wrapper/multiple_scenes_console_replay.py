@@ -1,4 +1,11 @@
 import os
+
+import rclpy
+from sensor_msgs.msg import Image
+
+from teleop_msgs.msg import ArmKinematics
+from teleop_msgs_helpers import ArmKinematics_helpers
+
 os.environ["KIVY_NO_ARGS"] = "1"
 from kivy.lang import Builder
 import numpy as np
@@ -2208,6 +2215,8 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
         self.obs.connect()
         #self.obs.start_recording()
 
+        self.frame_counter = 0
+
     def _step_simulation_task(self, task):
         """Step simulation
         """
@@ -2221,13 +2230,30 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
                 self.after_simulation_step()
 
                 # Call trigger update scene (if necessary) and draw methods
-                (width, height, rgb_pixels, depth_pixels, seg_pixels) = p.getCameraImage(
-                    width=256, height=256,
-                    viewMatrix=self.env._view_matrix,
-                    projectionMatrix=self.env._proj_matrix)
-                p.setGravity(0,0,-10.0)
+                self.frame_counter += 1
+                if output_framerate > 0 and self.frame_counter >= output_framerate:
+                    (width, height, rgb_pixels, depth_pixels, seg_pixels) = p.getCameraImage(
+                        # width=256, height=256,
+                        width=self.app.win.getXSize(), height=self.app.win.getYSize(),
+                        viewMatrix=self.env._view_matrix,
+                        projectionMatrix=self.env._proj_matrix)
+                else:
+                    # Due to changes I made to surrol, this will not use resources to take a screenshot
+                    (width, height, rgb_pixels, depth_pixels, seg_pixels) = p.getCameraImage(
+                        width=1, height=1,
+                        # width=self.app.win.getXSize(), height=self.app.win.getYSize(),
+                        viewMatrix=self.env._view_matrix,
+                        projectionMatrix=self.env._proj_matrix)
+
                 #print(width, height, rgb_pixels.shape, depth_pixels.shape, seg_pixels.shape)
                 self.time = task.time
+
+                if output_framerate > 0 and self.frame_counter >= output_framerate:
+                    rgb_array = np.array(rgb_pixels, dtype=np.uint8).reshape((height, width, 4)).astype(np.uint8)
+                    rgb_array = rgb_array[:, :, :3][:, :, ::-1]
+                    rgb_array = np.ascontiguousarray(rgb_array).tobytes()
+                    publish_png(rgb_array, width, height)
+                    self.frame_counter = 0
 
                 # --- Get PSM poses here ---
                 psm1_pose = self.env.psm1.get_current_position()
@@ -2240,6 +2266,9 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
                 pos2 = psm2_pose[:3, 3]
                 rot2 = R.from_matrix(psm2_pose[:3, :3]).as_euler('xyz')
                 #print(f"psm2 rot: {rot2[-1]}")
+
+                kinematic_msg = ArmKinematics_helpers.to_msg(psm1_pose, psm2_pose)
+                kinematicvideopublisher.publish(kinematic_msg)
 
                 if self.video_recording == False:
                     self.video_recording = True
@@ -2454,13 +2483,28 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
         self.kivy_ui.stop()
         self.app.win.removeDisplayRegion(self.ui_display_region)
 
-def main(node=None): # ecm steoro size 1024x768
-    global app, ros_node
+def main(node: rclpy.node.Node =None, framerate = 30): # ecm steoro size 1024x768
+    global app, ros_node, kinematicvideopublisher, videopublisher, output_framerate
+    output_framerate = framerate
     ros_node = node
+    kinematicvideopublisher = node.create_publisher(ArmKinematics, '/kinematics', 100)
+    videopublisher = node.create_publisher(Image, '/video', 100)
     app_cfg = ApplicationConfig(window_width=1850, window_height=1020)
     app = Application(app_cfg)
     open_scene(0)
     app.run()
 
+def publish_png(pixels, width, height):
+    msg = Image()
+    msg.header.stamp = ros_node.get_clock().now().to_msg()
+    msg.header.frame_id = "idk"
+    msg.height = height
+    msg.width = width
+    msg.encoding = 'rgb8'
+    msg.is_bigendian = False
+    msg.step = width * 3
+    msg.data = pixels
+
+    videopublisher.publish(msg)
 if __name__ == '__main__':
     main()
