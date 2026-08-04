@@ -2229,14 +2229,17 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
 
                 # Call trigger update scene (if necessary) and draw methods
                 (width, height, rgb_pixels, depth_pixels, seg_pixels) = p.getCameraImage(
-                    width=256, height=256,
+                    # width=256, height=256,
+                    width=self.app.win.getXSize(), height=self.app.win.getYSize(),
                     viewMatrix=self.env._view_matrix,
                     projectionMatrix=self.env._proj_matrix)
                 p.setGravity(0,0,-10.0)
                 #print(width, height, rgb_pixels.shape, depth_pixels.shape, seg_pixels.shape)
                 self.time = task.time
 
-                rgb_array = np.array(rgb_pixels, dtype=np.uint8).tobytes()
+                rgb_array = np.array(rgb_pixels, dtype=np.uint8).reshape((height, width, 4)).astype(np.uint8)
+                rgb_array = rgb_array[:, :, :3][:, :, ::-1]
+                rgb_array = np.ascontiguousarray(rgb_array).tobytes()
                 publish_png(rgb_array, width, height)
 
                 # --- Get PSM poses here ---
