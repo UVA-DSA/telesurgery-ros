@@ -100,3 +100,7 @@ In order to use this, in another terminal in the project directory, run:
 
 [Here's an example of me making sure the /video topic was displaying correct video information, alongside other topics](https://www.youtube.com/watch?v=zLNotvQsB9c)
 
+## Extra features
+- Logger: Enabled via launch argument at the command line. This only works with the console launch file, and logs all of its packets into a binary file for replaying later. This file is called `bin_replay` and is saved in the same directory where you launched the stack.
+- Profiler: Enabled via launch argument at the command line. This determines the total latency accumulated by messages running through ROS, and outputs it to `/profiler/latency`.
+
