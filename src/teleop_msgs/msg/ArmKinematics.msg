@@ -1,0 +1,12 @@
+float64 pos0_x
+float64 pos0_y
+float64 pos0_z
+float64 rot0_x
+float64 rot0_y
+float64 rot0_z
+float64 pos1_x
+float64 pos1_y
+float64 pos1_z
+float64 rot1_x
+float64 rot1_y
+float64 rot1_z
