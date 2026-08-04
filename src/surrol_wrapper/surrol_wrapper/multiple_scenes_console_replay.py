@@ -2215,6 +2215,9 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
         self.obs.connect()
         #self.obs.start_recording()
 
+        self.frame_counter = 0
+        self.record_every_x_frames = 30
+
     def _step_simulation_task(self, task):
         """Step simulation
         """
@@ -2228,19 +2231,30 @@ class SurgicalSimulatorBimanual(SurgicalSimulatorBase):
                 self.after_simulation_step()
 
                 # Call trigger update scene (if necessary) and draw methods
-                (width, height, rgb_pixels, depth_pixels, seg_pixels) = p.getCameraImage(
-                    # width=256, height=256,
-                    width=self.app.win.getXSize(), height=self.app.win.getYSize(),
-                    viewMatrix=self.env._view_matrix,
-                    projectionMatrix=self.env._proj_matrix)
-                p.setGravity(0,0,-10.0)
+                self.frame_counter += 1
+                if self.record_every_x_frames > 0 and self.frame_counter >= self.record_every_x_frames:
+                    (width, height, rgb_pixels, depth_pixels, seg_pixels) = p.getCameraImage(
+                        # width=256, height=256,
+                        width=self.app.win.getXSize(), height=self.app.win.getYSize(),
+                        viewMatrix=self.env._view_matrix,
+                        projectionMatrix=self.env._proj_matrix)
+                else:
+                    # Due to changes I made to surrol, this will not use resources to take a screenshot
+                    (width, height, rgb_pixels, depth_pixels, seg_pixels) = p.getCameraImage(
+                        width=1, height=1,
+                        # width=self.app.win.getXSize(), height=self.app.win.getYSize(),
+                        viewMatrix=self.env._view_matrix,
+                        projectionMatrix=self.env._proj_matrix)
+
                 #print(width, height, rgb_pixels.shape, depth_pixels.shape, seg_pixels.shape)
                 self.time = task.time
 
-                rgb_array = np.array(rgb_pixels, dtype=np.uint8).reshape((height, width, 4)).astype(np.uint8)
-                rgb_array = rgb_array[:, :, :3][:, :, ::-1]
-                rgb_array = np.ascontiguousarray(rgb_array).tobytes()
-                publish_png(rgb_array, width, height)
+                if self.record_every_x_frames > 0 and self.frame_counter >= self.record_every_x_frames:
+                    rgb_array = np.array(rgb_pixels, dtype=np.uint8).reshape((height, width, 4)).astype(np.uint8)
+                    rgb_array = rgb_array[:, :, :3][:, :, ::-1]
+                    rgb_array = np.ascontiguousarray(rgb_array).tobytes()
+                    publish_png(rgb_array, width, height)
+                    self.frame_counter = 0
 
                 # --- Get PSM poses here ---
                 psm1_pose = self.env.psm1.get_current_position()
