@@ -7,3 +7,6 @@
 [submodule "ext/pybullet_rendering"]
 	path = ext/pybullet_rendering
 	url = https://github.com/UVA-DSA/pybullet_rendering
+[submodule "ext/telesurgery-dataloader"]
+	path = ext/telesurgery-dataloader
+	url = git@github.com:UVA-DSA/telesurgery-dataloader
