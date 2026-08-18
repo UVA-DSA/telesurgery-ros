@@ -1,3 +1,7 @@
+class VideoStreamer(Node):
+
+
+
 def main() -> None:
     print('Hi from video.')
 
