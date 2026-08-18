@@ -1,4 +1,9 @@
+from rclpy.node import Node
+
+
 class VideoStreamer(Node):
+    def __init__(self):
+        super().__init__("video")
 
 
 
