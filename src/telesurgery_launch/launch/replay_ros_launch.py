@@ -112,4 +112,16 @@ def generate_launch_description():
                 'profiler': enable_profiler
             }.items(),
         ),
+
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="video",
+                    file_path="launch/video_launch.py"
+                )
+            ),
+            launch_arguments={
+                'config': 'config',
+            }.items(),
+        )
     ])
