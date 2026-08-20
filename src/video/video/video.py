@@ -13,15 +13,17 @@ class Video(Node):
         super().__init__("video")
 
         self.video_sub = self.create_subscription(Image, '/video', self.video_cb, 100)
-        # self.streamer = VideoStreamer()
+        self.streamer = VideoStreamer('127.0.0.1', 5005, self)
 
 
     def video_cb(self, msg: Image):
         bridge = CvBridge()
-        cv_frame = bridge.imgmsg_to_cv2(msg, desired_encoding="rgb8")
-        cv2.imshow('Video', cv_frame)
-        cv2.waitKey(1)
-        # self.streamer.add_to_queue(data)
+        cv_frame = bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+        # cv2.imshow('Video', cv_frame)
+        # cv2.waitKey(1)
+        # convert to jpg
+        _, encoded = cv2.imencode('.jpg', cv_frame)
+        self.streamer.add_to_queue(encoded.tobytes())
 
 
 def main(args=None) -> None:
