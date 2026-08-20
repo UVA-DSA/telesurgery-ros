@@ -113,10 +113,15 @@ def generate_launch_description():
             }.items(),
         ),
 
-        Node(
-            package='video',
-            executable='video',
-            name='video',
-            arguments=[],
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="video",
+                    file_path="launch/video_launch.py"
+                )
+            ),
+            launch_arguments={
+                'config': 'config',
+            }.items(),
         )
     ])

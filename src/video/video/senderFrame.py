@@ -32,6 +32,7 @@ class VideoStreamer:
         connected = False
         while not connected:
             try:
+                if not rclpy.ok(): break
                 self.socket.connect((self.ip, self.port))
                 connected = True
             except ConnectionRefusedError:
