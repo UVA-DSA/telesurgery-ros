@@ -1,5 +1,8 @@
-import os, socket, time, argparse
+import socket, time, argparse
+import threading
 from queue import Queue
+
+import rclpy
 
 
 class VideoStreamer:
@@ -13,33 +16,37 @@ class VideoStreamer:
     # imgs = os.listdir(args.dir)
     # imgs.sort()
 
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, node):
+        self.ip = ip
+        self.port = port
+        self.node: rclpy.node.Node = node
         # self.fps = 1.0 / 30
         self.socket = socket.socket()
         self.queue = Queue()
-        print("connecting")
+        self.node.get_logger().info("connecting")
+
+        self.send_thread = threading.Thread(target=self.send_loop)
+        self.send_thread.start()
+
+    def send_loop(self):
         connected = False
         while not connected:
             try:
-                self.socket.connect((ip, port))
+                self.socket.connect((self.ip, self.port))
                 connected = True
             except ConnectionRefusedError:
-                print("Connection refused, retrying in 3s")
+                self.node.get_logger().info("Connection refused, retrying in 3s")
                 time.sleep(3)
 
-    def send_thread(self):
         while rclpy.ok():
-            t0 = time.time()
-            path = os.path.join(args.dir, name)
-            with open(path, "rb") as f:
-                data = f.read()
-            s.sendall(f"{len(data):<16}".encode())
-            s.sendall(data)
-            t = time.time() - t0
-            if t < fps:
-                time.sleep(fps - t)
+            data = self.queue.get()
+            self.socket.sendall(f"{len(data):<16}".encode())
+            self.socket.sendall(data)
 
+    def add_to_queue(self, data):
+        self.queue.put(data)
 
     def close(self):
+        self.send_thread.join()
         print("done")
         self.socket.close()

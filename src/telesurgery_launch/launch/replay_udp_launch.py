@@ -111,4 +111,11 @@ def generate_launch_description():
                 'profiler': enable_profiler
             }.items(),
         ),
+
+        Node(
+            package='video',
+            executable='video',
+            name='video',
+            arguments=[],
+        ),
     ])
