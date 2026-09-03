@@ -94,9 +94,9 @@ def generate_launch_description():
         ),
 
         Node(
-            package='command_switch',
-            executable='command_switch',
-            name='command_switch',
+            package='master_controller',
+            executable='master_controller',
+            name='master_controller',
             arguments=[],
         ),
 

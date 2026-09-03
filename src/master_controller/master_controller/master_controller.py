@@ -5,9 +5,9 @@ from rclpy.node import Node
 from teleop_msgs.msg import RecoveryStatus, ITP
 
 
-class CommandSwitch(Node):
+class MasterController(Node):
     def __init__(self):
-        super().__init__('command_switch')
+        super().__init__('master_controller')
         self.publisher_ = self.create_publisher(ITP, '/final/itp_commands', 100)
         self.agent_listener = self.create_subscription(ITP, '/agent/itp_commands', self.agent_callback, 100)
         self.surgeon_listener = self.create_subscription(ITP, '/surgeon/itp_commands', self.surgeon_callback, 100)
@@ -29,9 +29,9 @@ class CommandSwitch(Node):
 def main(args=None):
     try:
         with rclpy.init(args=args):
-            node = CommandSwitch()
+            node = MasterController()
 
-            node.get_logger().info("Starting command switch. This listens to both surgeon and agent commands."
+            node.get_logger().info("Starting master controller. This listens to both surgeon and agent commands."
                                    "Depending on the state of the fault recovery state machine, it will forward one of them to /final/itp_commands.")
 
             rclpy.spin(node)
