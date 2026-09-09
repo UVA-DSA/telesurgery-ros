@@ -61,6 +61,9 @@ class ConsoleReplay(Node):
         # Wait for a message to be sent to the /replay_start topic
         if not msg.data: return
 
+        if self.thread:
+            self.thread.join()
+
         self.thread = threading.Thread(
             target=self.replay_obj.replay_ros,
             args=(self.itp_raw_publisher,)
