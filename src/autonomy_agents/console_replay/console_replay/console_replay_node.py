@@ -8,7 +8,7 @@ from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import Bool
 from rcl_interfaces.msg import ParameterDescriptor
 
-from teleop_msgs.msg import ITPRaw
+from teleop_msgs.msg import ITP
 from .replay import Replay
 
 
@@ -39,9 +39,9 @@ class ConsoleReplay(Node):
         )
         self.thread: threading.Thread = None
 
-        self.itp_raw_publisher = self.create_publisher(ITPRaw,
-                                                       self.get_parameter('ros_topic_name').get_parameter_value().string_value,
-                                                       100)
+        self.itp_publisher = self.create_publisher(ITP,
+                                self.get_parameter('ros_topic_name').get_parameter_value().string_value,
+                                100)
 
     def init_parameters(self):
         data_file_path_descriptor = ParameterDescriptor(
@@ -62,11 +62,14 @@ class ConsoleReplay(Node):
         if not msg.data: return
 
         if self.thread:
+            self.get_logger().info("(re)-Starting replay!")
             self.thread.join()
+        else:
+            self.get_logger().info("Starting replay!")
 
         self.thread = threading.Thread(
             target=self.replay_obj.replay_ros,
-            args=(self.itp_raw_publisher,)
+            args=(self.itp_publisher,)
         )
         self.thread.start()
 

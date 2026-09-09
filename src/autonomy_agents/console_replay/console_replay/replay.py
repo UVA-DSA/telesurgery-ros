@@ -5,7 +5,8 @@ import time
 import threading
 
 import rclpy.publisher
-from teleop_msgs.msg import ITPRaw
+from teleop_msgs.msg import ITP
+from teleop_msgs_helpers import ITP_helpers
 
 # This is an altered version of replay.py from the telesurgery-qos-analysis repository
 class Replay:
@@ -87,8 +88,8 @@ class Replay:
                     break
 
                 system_time = time.time()
-                msg = ITPRaw()
-                msg.data = data
+                d = ITP_helpers.bytes_to_dict(data)
+                msg = ITP_helpers.to_msg(d)
                 publisher.publish(msg)
                 packet_count += 1
                 previous_time = current_packet_time
