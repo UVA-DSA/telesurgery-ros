@@ -12,10 +12,9 @@ from rcl_interfaces.msg import ParameterDescriptor
 class FaultRecoveryStateMachine(Node):
     def __init__(self):
         super().__init__('fault_recovery_state_machine')
+        self.init_parameters()
         self.publisher_ = self.create_publisher(RecoveryStatus, '/recovery_type', 10)
         self.client = self.create_client(NetworkStatistics, '/network_statistics')
-        while not self.client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for /network_statistics service")
         self.timer = self.create_timer(10, self.dummy_timer_callback)
         self.state = RecoveryStatus.NORMAL_OPERATION
 

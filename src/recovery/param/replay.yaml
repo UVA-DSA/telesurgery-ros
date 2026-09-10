@@ -1,0 +1,4 @@
+/**:
+  ros__parameters:
+    state_machine:
+      state_override: AGENT
