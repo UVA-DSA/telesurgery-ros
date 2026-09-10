@@ -6,6 +6,8 @@ from rclpy.node import Node
 from teleop_msgs.msg import RecoveryStatus
 from teleop_msgs.srv import NetworkStatistics
 
+from rcl_interfaces.msg import ParameterDescriptor
+
 
 class FaultRecoveryStateMachine(Node):
     def __init__(self):
@@ -16,6 +18,15 @@ class FaultRecoveryStateMachine(Node):
             self.get_logger().info("Waiting for /network_statistics service")
         self.timer = self.create_timer(10, self.dummy_timer_callback)
         self.state = RecoveryStatus.NORMAL_OPERATION
+
+    def init_parameters(self):
+        state_override_descriptor = ParameterDescriptor(
+            type=rclpy.Parameter.Type.STRING,
+            description='Overrides state machine to only one state. '
+                        'SURGEON to only allow surgeon input, '
+                        'AGENT to only allow agent input.'
+        )
+        self.declare_parameter('state_machine.state_override', 'NONE', descriptor=state_override_descriptor)
 
     def dummy_timer_callback(self):
         future = self.fetch_network_statistics()
