@@ -81,8 +81,16 @@ def generate_launch_description():
                 )
             ),
             launch_arguments={
-                'config': 'replay',
+                'config': 'default',
             }.items(),
+            condition=IfCondition(enable_recovery)
+        ),
+
+        Node(
+            package='dummy_agent',
+            executable='dummy_agent',
+            name='dummy_agent',
+            arguments=[],
             condition=IfCondition(enable_recovery)
         ),
 

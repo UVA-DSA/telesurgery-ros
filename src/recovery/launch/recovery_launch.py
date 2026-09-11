@@ -34,12 +34,6 @@ def generate_launch_description():
         ),
         # Node(
         #     package='recovery',
-        #     executable='autonomy_engine',
-        #     name='autonomy_engine',
-        #     parameters=[config_file_path]
-        # ),
-        # Node(
-        #     package='recovery',
         #     executable='activity_recognition',
         #     name='activity_recognition',
         #     parameters=[config_file_path]
