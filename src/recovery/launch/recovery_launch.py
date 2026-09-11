@@ -32,12 +32,12 @@ def generate_launch_description():
             name='fault_recovery_state_machine',
             parameters=[config_file_path]
         ),
-        Node(
-            package='recovery',
-            executable='autonomy_engine',
-            name='autonomy_engine',
-            parameters=[config_file_path]
-        ),
+        # Node(
+        #     package='recovery',
+        #     executable='autonomy_engine',
+        #     name='autonomy_engine',
+        #     parameters=[config_file_path]
+        # ),
         # Node(
         #     package='recovery',
         #     executable='activity_recognition',

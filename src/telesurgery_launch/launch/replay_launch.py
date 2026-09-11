@@ -18,12 +18,6 @@ def generate_launch_description():
         description='Enable fault injector'
     )
 
-    enable_recovery_arg = DeclareLaunchArgument(
-        'recovery',
-        default_value='False',
-        description='Enable recovery nodes'
-    )
-
     enable_profiler_arg = DeclareLaunchArgument(
         'profiler',
         default_value='False',
@@ -31,12 +25,10 @@ def generate_launch_description():
     )
 
     enable_fault_injector = LaunchConfiguration('enable_fault_injector')
-    enable_recovery = LaunchConfiguration('recovery')
     enable_profiler = LaunchConfiguration('profiler')
 
     return LaunchDescription([
         enable_fault_injector_arg,
-        enable_recovery_arg,
         enable_profiler_arg,
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
@@ -78,20 +70,16 @@ def generate_launch_description():
             }.items()
         ),
 
-        Node(
-            package='recovery',
-            executable='fault_recovery_state_machine',
-            name='fault_recovery_state_machine',
-            arguments=[],
-            condition=IfCondition(enable_recovery)
-        ),
-
-        Node(
-            package='recovery',
-            executable='autonomy_engine',
-            name='autonomy_engine',
-            arguments=[],
-            condition=IfCondition(enable_recovery)
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="recovery",
+                    file_path="launch/recovery_launch.py"
+                )
+            ),
+            launch_arguments={
+                'config': 'replay',
+            }.items()
         ),
 
         Node(

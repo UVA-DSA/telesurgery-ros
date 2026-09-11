@@ -73,19 +73,16 @@ def generate_launch_description():
             }.items()
         ),
 
-        Node(
-            package='recovery',
-            executable='fault_recovery_state_machine',
-            name='fault_recovery_state_machine',
-            arguments=[],
-            condition=IfCondition(enable_recovery)
-        ),
-
-        Node(
-            package='recovery',
-            executable='autonomy_engine',
-            name='autonomy_engine',
-            arguments=[],
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="recovery",
+                    file_path="launch/recovery_launch.py"
+                )
+            ),
+            launch_arguments={
+                'config': 'replay',
+            }.items(),
             condition=IfCondition(enable_recovery)
         ),
 
