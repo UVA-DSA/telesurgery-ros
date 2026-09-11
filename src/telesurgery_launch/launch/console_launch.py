@@ -73,26 +73,31 @@ def generate_launch_description():
             }.items()
         ),
 
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                get_share_file(
+                    package_name="recovery",
+                    file_path="launch/recovery_launch.py"
+                )
+            ),
+            launch_arguments={
+                'config': 'default',
+            }.items(),
+            condition=IfCondition(enable_recovery)
+        ),
+
         Node(
-            package='recovery',
-            executable='fault_recovery_state_machine',
-            name='fault_recovery_state_machine',
+            package='dummy_agent',
+            executable='dummy_agent',
+            name='dummy_agent',
             arguments=[],
             condition=IfCondition(enable_recovery)
         ),
 
         Node(
-            package='recovery',
-            executable='autonomy_engine',
-            name='autonomy_engine',
-            arguments=[],
-            condition=IfCondition(enable_recovery)
-        ),
-
-        Node(
-            package='command_switch',
-            executable='command_switch',
-            name='command_switch',
+            package='master_controller',
+            executable='master_controller',
+            name='master_controller',
             arguments=[],
         ),
 

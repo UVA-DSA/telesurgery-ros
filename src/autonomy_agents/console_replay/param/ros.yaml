@@ -1,0 +1,5 @@
+/console_replay:
+  ros__parameters:
+    data_file_name: 'console_data_complete_7.bin'
+    ros_topic_name: /agent/itp_commands
+

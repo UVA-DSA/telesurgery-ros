@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'command_switch'
+package_name = 'master_controller'
 
 setup(
     name=package_name,
@@ -25,7 +25,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'command_switch = command_switch.command_switch:main'
+            'master_controller = master_controller.master_controller:main'
         ],
     },
 )

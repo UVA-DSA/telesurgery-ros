@@ -8,7 +8,7 @@ from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import Bool
 from rcl_interfaces.msg import ParameterDescriptor
 
-from teleop_msgs.msg import ITPRaw
+from teleop_msgs.msg import ITP
 from .replay import Replay
 
 
@@ -39,9 +39,9 @@ class ConsoleReplay(Node):
         )
         self.thread: threading.Thread = None
 
-        self.itp_raw_publisher = self.create_publisher(ITPRaw,
-                                                       self.get_parameter('ros_topic_name').get_parameter_value().string_value,
-                                                       100)
+        self.itp_publisher = self.create_publisher(ITP,
+                                self.get_parameter('ros_topic_name').get_parameter_value().string_value,
+                                100)
 
     def init_parameters(self):
         data_file_path_descriptor = ParameterDescriptor(
@@ -50,49 +50,26 @@ class ConsoleReplay(Node):
         )
         self.declare_parameter('data_file_name', '', descriptor=data_file_path_descriptor)
 
-        output_mode_descriptor = ParameterDescriptor(
-            type=rclpy.Parameter.Type.STRING,
-            description='Whether to output UDP packets (UDP) or ROS2 messages (ROS)'
-        )
-        self.declare_parameter('output_mode', 'ROS', descriptor=output_mode_descriptor)
-
         ros_topic_descriptor = ParameterDescriptor(
             type=rclpy.Parameter.Type.STRING,
             description='ROS topic name'
         )
-        self.declare_parameter('ros_topic_name', '/itp_commands', descriptor=ros_topic_descriptor)
-
-        udp_ip_descriptor = ParameterDescriptor(
-            type=rclpy.Parameter.Type.STRING,
-            description='UDP IP address'
-        )
-        self.declare_parameter('udp_ip', '127.0.0.1', descriptor=udp_ip_descriptor)
-
-        udp_port_descriptor = ParameterDescriptor(
-            type=rclpy.Parameter.Type.INTEGER,
-            description='UDP port number'
-        )
-        self.declare_parameter('udp_port', 5001, descriptor=udp_port_descriptor)
+        self.declare_parameter('ros_topic_name', '/agent/itp_commands', descriptor=ros_topic_descriptor)
 
 
     def start(self, msg: Bool):
         # Wait for a message to be sent to the /replay_start topic
         if not msg.data: return
 
-        mode = self.get_parameter('output_mode').get_parameter_value().string_value
-        if mode.lower() == 'udp':
-            self.get_logger().info("Starting replay on UDP")
-            args = (self.get_parameter('udp_ip').get_parameter_value().string_value, self.get_parameter('udp_port').get_parameter_value().integer_value)
-            func = self.replay_obj.replay_udp
-        elif mode.lower() == 'ros' or mode.lower() == 'ros2':
-            self.get_logger().info("Starting replay on ROS")
-            func = self.replay_obj.replay_ros
-            args = (self.itp_raw_publisher,)
+        if self.thread:
+            self.get_logger().info("(re)-Starting replay!")
+            self.thread.join()
         else:
-            raise KeyError(f"Unsupported mode: {mode}")
+            self.get_logger().info("Starting replay!")
 
         self.thread = threading.Thread(
-            target=func, args=args, daemon=True
+            target=self.replay_obj.replay_ros,
+            args=(self.itp_publisher,)
         )
         self.thread.start()
 

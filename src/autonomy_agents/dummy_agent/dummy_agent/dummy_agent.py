@@ -5,9 +5,9 @@ from rclpy.node import Node
 from teleop_msgs.msg import ITP, RecoveryStatus
 
 
-class AutonomyEngine(Node):
+class DummyAgent(Node):
     def __init__(self):
-        super().__init__('autonomy_engine')
+        super().__init__('dummy_agent')
         self.publisher = self.create_publisher(ITP, '/agent/itp_commands', 100)
         self.state_listener = self.create_subscription(RecoveryStatus, '/recovery_type', self.recovery_callback, 10)
         self.timer = self.create_timer(0.5, self.publish_dummy_itp)
@@ -29,8 +29,8 @@ class AutonomyEngine(Node):
 def main(args=None):
     try:
         with rclpy.init(args=args):
-            node = AutonomyEngine()
-            node.get_logger().info("Starting dummy autonomy engine. This sends agent ITP packets to /agent/itp_commands")
+            node = DummyAgent()
+            node.get_logger().info("Starting dummy agent. This sends agent ITP packets to /agent/itp_commands")
 
             rclpy.spin(node)
     except (KeyboardInterrupt, ExternalShutdownException):
